@@ -39,8 +39,17 @@ def session(id):
     # GET /session/<id>
     
 @app.route("/health",methods=["GET"])
-def health(): 
-    # GET /health
+def testdb():
+    if request.method == "GET":
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute("Select VERSION()")
+        results = cur.fetchone()
+        ver = results[0]
+        if (ver is None):
+            return render_template("health.html", content="no")
+        else: 
+            return render_template("health.html", content="OK")
     
 
  
