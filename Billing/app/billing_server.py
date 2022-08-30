@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template
+from flaskext.mysql import MySQL
 
 app = Flask(__name__)
 
+#DATABASE CONNECTION to configure!!!!!!!!!!!!
+#  |
+#  V
+# mysql = MySQL()
+# app.config['MYSQL_DATABASE_USER'] = 'flask'
+# app.config['MYSQL_DATABASE_PASSWORD'] = 'pass'
+# app.config['MYSQL_DATABASE_DB'] = ''
+# app.config['MYSQL_DATABASE_HOST'] = ''
+# mysql.init_app(app)
 
 def run():
     app.run(host="0.0.0.0")
