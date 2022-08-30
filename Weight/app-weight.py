@@ -2,8 +2,11 @@ from locale import format_string
 from logging import root
 from flask import Flask,render_template, request
 from datetime import datetime
-from flaskext.mysql import MySQL
+from flasktext.mysql import MySQL
 from datetime import datetime
+import csv
+import json
+import mysql.connector
 
 app = Flask(__name__)
 # mysql = MySQL()
@@ -58,6 +61,40 @@ def testdb():
     
 
  
+db =  mysql.connector.connect(user='root', host='172.17.0.3', port='3306', password='password', database='weight')
+cur = db.cursor()
+
+input = "container2.json"
+index = input.index(".")
+extension = input[index:index+5]
+
+def json_parsing():
+    f = open(input)
+    data = json.load(f)
+    for element in data:
+        id = element["id"]
+        weight = element["weight"]
+        unit = element["unit"]
+        cur.execute("INSERT INTO containers_registered(container_id,weight,unit) VALUES (%s, %s, %s)", (id,weight,unit))
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
 	app.run()
  
