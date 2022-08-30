@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flaskext.mysql import MySQL
 
 app = Flask(__name__)
 
-#DATABASE CONNECTION to configure!!!!!!!!!!!!
-#  |
-#  V
-# mysql = MySQL()
-# app.config['MYSQL_DATABASE_USER'] = 'flask'
-# app.config['MYSQL_DATABASE_PASSWORD'] = 'pass'
-# app.config['MYSQL_DATABASE_DB'] = ''
-# app.config['MYSQL_DATABASE_HOST'] = ''
-# mysql.init_app(app)
+mysql = MySQL()
+app.config["MYSQL_DATABASE_USER"] = "root"
+app.config["MYSQL_DATABASE_PASSWORD"] = "password"
+app.config["MYSQL_DATABASE_DB"] = "billdb"
+app.config["MYSQL_DATABASE_HOST"] = "db_server"
+mysql.init_app(app)
+
 
 def run():
     app.run(host="0.0.0.0")
@@ -29,11 +27,17 @@ def health():
     return "OK"
 
 
-@app.route("/provider", methods=["POST"])
+# Temporarily changed to GET for testing -- later change to POST method!!!
+@app.route("/provider", methods=["GET"])
 def add_provider():
+    connector = mysql.connect()
+    cursor = connector.cursor()
+    cursor.execute(f"SELECT * FROM Providers")
+    data = cursor.fetchall()
+    return "data"
     # here we should add creating new provider
     # it should return a unique provider id as json: { "id":<str>}
-    return 0
+    # return 0
 
 
 @app.route("/provider/<id>", methods=["PUT"])
