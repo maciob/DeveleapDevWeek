@@ -5,10 +5,10 @@ from flaskext.mysql import MySQL
 app = Flask(__name__)
 
 mysql = MySQL()
-app.config["MYSQL_DATABASE_USER"] = "root"
-app.config["MYSQL_DATABASE_PASSWORD"] = "password"
+app.config["MYSQL_DATABASE_USER"] = "app"
+app.config["MYSQL_DATABASE_PASSWORD"] = "pass"
 app.config["MYSQL_DATABASE_DB"] = "billdb"
-app.config["MYSQL_DATABASE_HOST"] = "db_server"
+app.config["MYSQL_DATABASE_HOST"] = "172.17.0.3"
 mysql.init_app(app)
 
 
@@ -30,20 +30,18 @@ def health():
 # Temporarily changed to GET for testing -- later change to POST method!!!
 @app.route("/provider", methods=["GET"])
 def add_provider():
-    connector = mysql.connect()
-    cursor = connector.cursor()
-    cursor.execute(f"SELECT * FROM Providers")
-    data = cursor.fetchall()
-    return "data"
-    # here we should add creating new provider
-    # it should return a unique provider id as json: { "id":<str>}
-    # return 0
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute(f"SELECT * FROM Provider")
+    data = cur.fetchall()
+    return f"{data}"
+    
 
 
-@app.route("/provider/<id>", methods=["PUT"])
+@app.route("/provider/<id>", methods=["GET"])
 def update_provider(id):
     # here we should add updating provider
-    return 0
+    return f"{id}"
 
 
 if __name__ == "__main__":
