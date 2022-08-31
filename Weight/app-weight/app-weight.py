@@ -42,22 +42,29 @@ def item(id):
     return None
     
 @app.route("/session/<id>",methods=["GET"])
-def session(id): 
-    # GET /session/<id>
-    return None
+def sessionid(id):
+    s1 = mysql.connect()
+    cur = s1.cursor()
+    query = """select * from containers_registered where container_id = %s"""
+    tuple1 = id
+    cur.execute(query, tuple1)
+    sessions = cur.fetchall()
+    return render_template("session.html", content = sessions)
     
 @app.route("/health",methods=["GET"])
 def testdb():
-    if request.method == "GET":
+    
+    try:
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute("Select VERSION()")
-        results = cur.fetchone()
-        ver = results[0]
-        if (ver is None):
-            return render_template("health.html", content="no")
-        else: 
-            return render_template("health.html", content="OK")
+        cur.execute("select * from containers_registered")
+        results = cur.fetchall()
+        if results:
+            thisdict = {"Connection": "OK"}
+            return thisdict
+    except:
+        thisdict = {"Connection": "No"}
+        return thisdict
     
 
 def handling_files(file):
