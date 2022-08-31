@@ -2,3 +2,4 @@ flask
 flask-mysql
 pandas
 openpyxl
+cryptography
