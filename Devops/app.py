@@ -22,11 +22,12 @@ def list():
     r = request.json
     before = r["before"]
     after = r["after"]
-    # os.system("docker ps -a")
+    #os.system("docker ps -a")
     lista.append(before)
     lista.append(after)
     lock.acquire()
-    time.sleep(20)  # testingphase
+    os.system("git pull")
+    #time.sleep(20)  # testingphase
     lock.release()
     return jsonify(success=True)
 
