@@ -1,3 +1,2 @@
 #!/bin/bash
-
-docker rm -f flask_server db_server
+docker rm -f mysql-flask-app-container python-flask-app-container
