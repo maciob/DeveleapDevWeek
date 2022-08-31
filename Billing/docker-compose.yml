@@ -1,0 +1,23 @@
+version: '3.7' 
+services: 
+  python-flask-app-container:
+    image: billing_server:1.0
+    container_name: python-flask-app-container
+    ports:
+     - "8086:5000"
+    volumes:
+     - ./app/in:/app/in
+  mysql:
+    image: mysql_db:1.0
+    container_name: mysql-flask-app-container
+    ports:
+      - "8087:3306"
+    # environment:
+    #   - MYSQL_ROOT_PASSWORD:1234
+    volumes:
+      - ./db_volume:/var/lib/mysql
+    
+
+# networks:
+#   mysql-python-app-network:
+#     name: mysql-python-app-network
