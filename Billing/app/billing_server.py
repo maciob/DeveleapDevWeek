@@ -11,6 +11,8 @@ app.config["MYSQL_DATABASE_DB"] = "billdb"
 app.config["MYSQL_DATABASE_HOST"] = "172.17.0.3"
 mysql.init_app(app)
 
+independiences = {"Database": "Unknown"}
+
 
 def run():
     app.run(host="0.0.0.0")
@@ -23,8 +25,24 @@ def home():
 
 @app.route("/health", methods=["GET"])
 def health():
-    # here we should add checking connection to database
-    return "OK"
+    try:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM Provider")
+        data = cur.fetchone()
+        if data:
+            independiences["Database"] = "OK"
+            return independiences
+    except:
+        independiences["Database"] = "DOWN"
+        return independiences
+    # DO NOT DELETE COMMENTS BELOW  - ITS ANOTHER VERSION, MAYBE FOR FUTURE USAGE :)
+    # if data:
+    #     independiences["Database"] = "OK"
+    #     return independiences
+    # else:
+    #     independiences["Database"] = "DOWN"
+    #     return independiences
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -35,7 +53,6 @@ def add_provider():
     cur.execute(f"SELECT * FROM Provider")
     data = cur.fetchall()
     return f"{data}"
-    
 
 
 @app.route("/provider/<id>", methods=["GET"])
