@@ -16,6 +16,9 @@ services:
     #   - MYSQL_ROOT_PASSWORD:1234
     volumes:
       - ./db_volume:/var/lib/mysql
+    depends_on:
+      - python-flask-app-container
+
     
 
 # networks:

@@ -10,7 +10,7 @@ from flask import send_file
 hostname = socket.gethostname()
 IPAddr = socket.gethostbyname(hostname)
 temp_list = IPAddr.split(".")
-last_digit = int(temp_list[3]) - 1
+last_digit = int(temp_list[3]) + 1
 temp_list[3] = str(last_digit)
 new_IP = ".".join(temp_list)
 
@@ -102,7 +102,7 @@ def ip():
     hostname = socket.gethostname()
     IPAddr = socket.gethostbyname(hostname)
     temp_list = IPAddr.split(".")
-    last_digit = int(temp_list[3]) - 1
+    last_digit = int(temp_list[3]) + 1
     temp_list[3] = str(last_digit)
     new_IP = ".".join(temp_list)
     return (
