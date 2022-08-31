@@ -23,10 +23,14 @@ def weight():
     return None
  
 
-@app.route("/batch-weight ",methods=["POST"])
+@app.route("/batch-weight",methods=["GET","POST"])
 def batch_weight(): 
-	# POST /batch-weight
-    return None
+    if request.method == "POST":
+        details = request.form
+        file = details['file']
+        handling_files(file)
+    return render_template("batch.html")
+
 
 
 
@@ -111,17 +115,15 @@ def testdb():
         thisdict = {"Connection": "No"}
         return thisdict
     
-
 def handling_files(file):
-    db =  mysql.connector.connect(user='root', host='172.17.0.3', port='3306', password='password', database='weight') #Data for changing, cause of different cases
-    cur = db.cursor()
-
+    conn = mysql.connect()
+    cur = conn.cursor()
     input = file
     index = input.index(".")
     extension = input[index:index+5]
 
     def json_parsing():    #Handling json_files
-        f = open(input)
+        f = open(f"in/{input}")
         data = json.load(f)
         for element in data:
             id = element["id"]
@@ -130,7 +132,7 @@ def handling_files(file):
             cur.execute("INSERT INTO containers_registered(container_id,weight,unit) VALUES (%s, %s, %s)", (id,weight,unit))
 
     def csv_parsing():      #Handling csv files
-        with open(input) as file:
+        with open(f"in/{input}") as file:
             content = file.readlines()
             unit = content[0].split(",")[1][1:3]
             for num in range (1,len(content) -1):
@@ -152,11 +154,7 @@ def handling_files(file):
 
 #Execution of logic
     extract_data()
-
-#END
-       
-
-
+    
 
 
 
