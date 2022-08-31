@@ -2,6 +2,18 @@
 
 {% block content %}
     <h1>{% block title %} {{ title }} {% endblock %}</h1>
-    <p> {{providers}} </p>
+    <p> All providers: {{providers}} </p>
+    
+    
+    <form method="post" target="response_frame">
+        <div class="input-group mb-3">
+            <span class="input-group-text">Provider NAME</span>
+        <input type="text" class="form-control"  placeholder="Your company name" name="username">
+        <button class="btn btn-outline-secondary" type="submit">Submit</button>
+        </div>
+    </form>
+    <div class="container">
+        <iframe name="response_frame"></iframe>
+</div> 
    
 {% endblock %}

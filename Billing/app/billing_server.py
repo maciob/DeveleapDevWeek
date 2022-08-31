@@ -53,7 +53,7 @@ def add_provider():
         cur = conn.cursor()
         cur.execute(f"SELECT * FROM Provider")
         data = cur.fetchall()
-        return f"{data}"
+        return render_template("provider.html", providers=data, title="Add provider")
     else:
         name=request.form["username"]
         conn = mysql.connect()
