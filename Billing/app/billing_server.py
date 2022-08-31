@@ -23,7 +23,7 @@ app.config["MYSQL_DATABASE_DB"] = "billdb"
 app.config["MYSQL_DATABASE_HOST"] = f"{new_IP}"
 mysql.init_app(app)
 
-independiences = {"Database": "Unknown"}
+dependiences = {"Database": "Unknown"}
 
 
 def run():
@@ -43,18 +43,18 @@ def health():
         cur.execute(f"SELECT * FROM Provider")
         data = cur.fetchone()
         if data:
-            independiences["Database"] = "OK"
-            return independiences
+            dependiences["Database"] = "OK"
+            return dependiences
     except:
-        independiences["Database"] = "DOWN"
-        return independiences
+        dependiences["Database"] = "DOWN"
+        return dependiences
     # DO NOT DELETE COMMENTS BELOW  - ITS ANOTHER VERSION, MAYBE FOR FUTURE USAGE :)
     # if data:
-    #     independiences["Database"] = "OK"
-    #     return independiences
+    #     dependiences["Database"] = "OK"
+    #     return dependiences
     # else:
-    #     independiences["Database"] = "DOWN"
-    #     return independiences
+    #     dependiences["Database"] = "DOWN"
+    #     return dependiences
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -149,11 +149,10 @@ def rates():
         path = "in/rates.xlsx"
         return send_file(path, as_attachment=True)
 
-        
     elif request.method == "POST":
-        excel_data = pd.read_excel('in/rates.xlsx')
+        excel_data = pd.read_excel("in/rates.xlsx")
         # Read the values of the file in the dataframe
-        data = pd.DataFrame(excel_data, columns=['Product', 'Rate', 'Scope'])
+        data = pd.DataFrame(excel_data, columns=["Product", "Rate", "Scope"])
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"DELETE FROM Rates;")
@@ -162,8 +161,10 @@ def rates():
         for i in range(len(data.index)):
             conn = mysql.connect()
             cur = conn.cursor()
-            
-            cur.execute(f"INSERT INTO Rates (product_id, rate, scope) VALUES ('{data.iloc[i,0]}','{data.iloc[i,1]}','{data.iloc[i,2]}');")
+
+            cur.execute(
+                f"INSERT INTO Rates (product_id, rate, scope) VALUES ('{data.iloc[i,0]}','{data.iloc[i,1]}','{data.iloc[i,2]}');"
+            )
             conn.commit()
 
         conn = mysql.connect()
@@ -171,7 +172,6 @@ def rates():
         cur.execute(f"SELECT * FROM Rates;")
         data = cur.fetchall()
         return str(data)
-        
 
 
 if __name__ == "__main__":
