@@ -46,13 +46,26 @@ def health():
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
-@app.route("/provider", methods=["GET"])
+@app.route("/provider", methods=["GET","POST"])
 def add_provider():
-    conn = mysql.connect()
-    cur = conn.cursor()
-    cur.execute(f"SELECT * FROM Provider")
-    data = cur.fetchall()
-    return f"{data}"
+    if request.method == "GET":
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM Provider")
+        data = cur.fetchall()
+        return f"{data}"
+    else:
+        name=request.form["username"]
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
+        conn.commit()
+        
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
+        data = cur.fetchall()
+        return str(data)
 
 
 @app.route("/provider/<id>", methods=["GET"])
