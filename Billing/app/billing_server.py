@@ -64,14 +64,29 @@ def add_provider():
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
-        data = cur.fetchall()
+        data = cur.fetchone()
         return str(data)
 
 
-@app.route("/provider/<id>", methods=["GET"])
+@app.route("/provider/<id>", methods=["PUT"])
 def update_provider(id):
-    # here we should add updating provider
-    return f"{id}"
+    name=request.form["username"]
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
+    conn.commit()
+    
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
+    data = cur.fetchone()
+    return str(data)
+
+@app.route("/ip", methods=["GET"])
+def ip():
+    resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
+    return "</br>".join(resp)
+    
 
 
 if __name__ == "__main__":
