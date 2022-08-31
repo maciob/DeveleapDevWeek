@@ -87,7 +87,18 @@ def ip():
     resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
     return "</br>".join(resp)
     
-
+@app.route("/truck", methods=["POST", "PUT"])
+def truck():
+    if request.method == 'POST':
+        truck_id=request.form["truck_id"]
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"INSERT INTO Trucks (`id`) VALUES ('{truck_id}');")
+        conn.commit()
+        cur2 = conn.cursor()
+        cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
+        trucks = cur.fetchall()
+        return str(trucks)
 
 if __name__ == "__main__":
     run()
