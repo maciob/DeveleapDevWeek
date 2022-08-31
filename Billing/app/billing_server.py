@@ -3,6 +3,15 @@ from flask import Flask, render_template, request
 from flaskext.mysql import MySQL
 import pandas as pd
 from openpyxl import load_workbook
+import socket
+
+
+hostname = socket.gethostname()
+IPAddr = socket.gethostbyname(hostname)
+temp_list = IPAddr.split(".")
+last_digit = int(temp_list[3]) + 1
+temp_list[3] = str(last_digit)
+new_IP = ".".join(temp_list)
 
 app = Flask(__name__)
 
@@ -10,7 +19,7 @@ mysql = MySQL()
 app.config["MYSQL_DATABASE_USER"] = "app"
 app.config["MYSQL_DATABASE_PASSWORD"] = "pass"
 app.config["MYSQL_DATABASE_DB"] = "billdb"
-app.config["MYSQL_DATABASE_HOST"] = "172.17.0.3"
+app.config["MYSQL_DATABASE_HOST"] = f"{new_IP}"
 mysql.init_app(app)
 
 independiences = {"Database": "Unknown"}
@@ -48,7 +57,7 @@ def health():
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
-@app.route("/provider", methods=["GET","POST"])
+@app.route("/provider", methods=["GET", "POST"])
 def add_provider():
     if request.method == "GET":
         conn = mysql.connect()
@@ -57,12 +66,12 @@ def add_provider():
         data = cur.fetchall()
         return f"{data}"
     else:
-        name=request.form["username"]
+        name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
         conn.commit()
-        
+
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
@@ -72,51 +81,63 @@ def add_provider():
 
 @app.route("/provider/<id>", methods=["PUT"])
 def update_provider(id):
-    name=request.form["username"]
+    name = request.form["username"]
     conn = mysql.connect()
     cur = conn.cursor()
     cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
     conn.commit()
-    
+
     conn = mysql.connect()
     cur = conn.cursor()
     cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
     data = cur.fetchone()
     return str(data)
 
+
 @app.route("/ip", methods=["GET"])
 def ip():
-    resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
-    return "</br>".join(resp)
-    
-@app.route("/truck", methods=["POST", "GET"]) #GET added for testing
+    # resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
+    # return "</br>".join(resp)
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    temp_list = IPAddr.split(".")
+    last_digit = int(temp_list[3]) + 1
+    temp_list[3] = str(last_digit)
+    new_IP = ".".join(temp_list)
+    return (
+        f"Your flask app IP address is {IPAddr}, and DB server IP address is {new_IP}"
+    )
+
+
+@app.route("/truck", methods=["POST", "GET"])  # GET added for testing
 def add_truck():
-        if request.method == "POST": 
-            truck_id=request.form["truck_id"]
-            conn = mysql.connect()
-            cur = conn.cursor()
-            cur.execute(f"INSERT INTO Trucks (`id`) VALUES ('{truck_id}');")
-            conn.commit()
-            cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
-            trucks = cur.fetchall()
-            return str(trucks)
-        elif request.method == "GET":
-            conn = mysql.connect()
-            cur = conn.cursor()
-            cur.execute(f"SELECT * FROM Trucks;")
-            conn.commit()
-            trucks = cur.fetchall()
-            return str(trucks)
+    if request.method == "POST":
+        truck_id = request.form["truck_id"]
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"INSERT INTO Trucks (`id`) VALUES ('{truck_id}');")
+        conn.commit()
+        cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
+        trucks = cur.fetchall()
+        return str(trucks)
+    elif request.method == "GET":
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM Trucks;")
+        conn.commit()
+        trucks = cur.fetchall()
+        return str(trucks)
 
 
 @app.route("/truck/<id>", methods=["PUT"])
 def updadate_(id):
-    provider_id=request.form["provider_id"]
+    provider_id = request.form["provider_id"]
     conn = mysql.connect()
     cur = conn.cursor()
     cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
     conn.commit()
     return "OK"
+
 
 @app.route("/rates", methods=["POST", "GET"])
 def rates():
@@ -127,6 +148,7 @@ def rates():
     elif request.method == "POST":
         ###
         return "ok"
+
 
 if __name__ == "__main__":
     run()
