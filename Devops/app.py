@@ -2,24 +2,38 @@ from flask import Flask, jsonify
 from datetime import datetime
 import requests
 from flask import request
-
+import json
+import time
+import os
 app = Flask(__name__)
-logs = []
+
+lista = []
+
+testingflag=False
 
 @app.route("/api", methods=["POST"])
 def list():
-    r = request.data.decode('utf-8')
-    logs.append(r)
-    return jsonify(success=True)
+	global testingflag
+	r = request.json
+	before = r['before']
+	after = r['after']
+	os.system("docker ps -a")
+	lista.append(before)
+	lista.append(after)
+	#lock acquire
+	while(True):
+		if testingflag==False:
+			testingflag=True
+			time.sleep(20)
+			testingflag=False
+			break
+	#lock release
+	return jsonify(success=True)
 
 @app.route("/home")
 def home():
-    #now = datetime.now()
-    #r = requests.get("http://172.18.0.2:5000")
-    #logs.append(r.text)
 
-    #    y = requests.args.get()
-    return "\n".join(logs)
-
+	return lista
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8089)
+	testingflag=False
+	app.run(host='0.0.0.0', port=8089)
