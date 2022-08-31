@@ -2,7 +2,7 @@ from locale import format_string
 from logging import root
 from flask import Flask,render_template, request
 from datetime import datetime
-from flasktext.mysql import MySQL
+from flaskext.mysql import MySQL
 from datetime import datetime
 import csv
 import json
@@ -16,7 +16,10 @@ app = Flask(__name__)
 # app.config['MYSQL_DATABASE_HOST'] = '172.17.0.3'
 # mysql.init_app(app)
 
-
+@app.route("/",methods=["GET"])
+def home():
+    return "<h1>Hello!<h1> This is the main page of the weight team app!"
+    
 @app.route("/weight ",methods=["POST"])
 def weight(): 
 	# POST /weight
