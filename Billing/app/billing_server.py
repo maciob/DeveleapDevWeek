@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template, request
 from flaskext.mysql import MySQL
+import pandas as pd
+from openpyxl import load_workbook
 
 app = Flask(__name__)
 
@@ -115,6 +117,16 @@ def updadate_(id):
     cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
     conn.commit()
     return "OK"
+
+@app.route("/rates", methods=["POST", "GET"])
+def rates():
+    if request.method == "GET":
+        book = load_workbook("in/rates.xlsx")
+        sheet = book.active
+        return render_template("s3_excel_table.html", sheet=sheet)
+    elif request.method == "POST":
+        ###
+        return "ok"
 
 if __name__ == "__main__":
     run()
