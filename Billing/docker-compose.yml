@@ -7,12 +7,20 @@ services:
      - "${PORT_SERVER}:5000"
     volumes:
      - ./app/in:/app/in
+    networks:
+     - mynet
   mysql-flask-app-container:
     image: mysql_db:1.0
     container_name: mysql-flask-app-container
     ports:
-      - "${PORT_DB}:3306"
+     - "${PORT_DB}:3306"
     volumes:
-      - ./db_volume:/var/lib/mysql
+     - ./db_volume:/var/lib/mysql
+    networks:
+     - mynet
     depends_on:
-      - python-flask-app-container
+     - python-flask-app-container
+
+networks:
+  mynet:
+    name: mynet
