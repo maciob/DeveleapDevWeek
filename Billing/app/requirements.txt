@@ -1,5 +1,5 @@
 flask
 flask-mysql
 pandas
-openpyxl
+# openpyxl
 cryptography
