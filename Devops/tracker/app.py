@@ -3,6 +3,7 @@ import json
 import os
 import threading
 import time
+import re
 
 app = Flask(__name__)
 
@@ -24,20 +25,24 @@ def list():
     before = r["before"]
     after = r["after"]
     branch = r["ref"]
-    #lista.append(before)
-    #lista.append(after)
-    #lista.append(branch)
+
     lock.acquire()
-    #os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
+    os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
     lista.append(before)
     lista.append(after)
     lista.append(branch)
+    br = re.search(r'/[a-zA-Z]+g',branch)
+    os.system(f"git checkout {after}")
     os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
-    os.system("docker build -t mysql_db:1.0  db/.")
-    os.system("docker build -t billing_server:1.0 app/.")
-    os.system("command docker-compose --env-file ./config/.env.prod up --detach")
-    #docker rm -f mysql-flask-app-container python-flask-app-container
+    os.system("docker build . -t mysql_db:1.0  -f git/DeveleapDevWeek/Billing/db/Dockerfile")
+    os.system("docker build . -t billing_server:1.0 -f git/Develeap/DeveleapDevWeek/Billing/app/Dockerfile")
+    os.system("command docker-compose --env-file ./config/.env.dev up --detach")
+    os.system("./git/DeveleapDevWeek/Billing/test_batch.sh")
+    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
+    os.system("rm -r git")
+    os.system("mkdir git")
     lock.release()
+
     return jsonify(success=True)
 
 
