@@ -22,7 +22,7 @@ def home():
     return "".join(port_list)
 
 
-@app.route("/health-post")
+@app.route("/health-post",methods=["GET"])
 def health_post():
 
     post_ports = [8080, 8082, 8084, 8086, 8088, 8089]
