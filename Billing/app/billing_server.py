@@ -4,6 +4,8 @@ from flaskext.mysql import MySQL
 import pandas as pd
 import socket
 from flask import send_file
+from datetime import datetime
+import requests
 
 
 def get_ip():
@@ -135,14 +137,28 @@ def add_truck():
         return str(trucks)
 
 
-@app.route("/truck/<id>", methods=["PUT"])
+@app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
-    provider_id = request.form["provider_id"]
-    conn = mysql.connect()
-    cur = conn.cursor()
-    cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
-    conn.commit()
-    return "OK"
+    if request.method == 'PUT':
+        provider_id = request.form["provider_id"]
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
+        conn.commit()
+        return "OK"
+    if request.method == 'GET':
+        now = datetime.now()
+        month = now.strftime('%m')
+        year = now.strftime('%Y')
+        current_time = now.strftime("%Y%m%d%H%M%S")
+        truck_id = id
+        t1 = request.form.get("t1", f'{year}01{month}000000')
+        t2 = request.form.get("t2", current_time)
+        #weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
+        weight_response={'id': truck_id,  't1': t1, 't2': t2}
+        return jsonify(weight_response)
+
+    
 
 
 @app.route("/rates", methods=["POST", "GET"])
