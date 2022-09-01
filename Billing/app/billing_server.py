@@ -199,12 +199,12 @@ def rates():
                 f"INSERT INTO Rates (product_id, rate, scope) VALUES ('{data.iloc[i,0]}','{data.iloc[i,1]}','{data.iloc[i,2]}');"
             )
             conn.commit()
-
+    
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"SELECT * FROM Rates;")
         data = cur.fetchall()
-        return str(data)
+        return "Inserted into DB successfully"
 
 
 if __name__ == "__main__":
