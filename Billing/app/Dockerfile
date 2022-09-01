@@ -1,5 +1,5 @@
 FROM python:slim
-COPY /Billing/app/ /app/
-WORKDIR /app
+WORKDIR app/
+COPY Billing/app/. .
 RUN pip install -r requirements.txt
 ENTRYPOINT ["./billing_server.py"]
