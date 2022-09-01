@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pushd ../ > /dev/null
-bash -c ./init.sh
+command ./init.sh "test"
 popd > /dev/null
 
 sleep 2
