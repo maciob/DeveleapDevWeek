@@ -12,7 +12,7 @@ commit_list=[]
 
 @app.route("/api", methods=["POST"])
 def list():
-#shadow    
+    
     r = request.json
     
     if type(r) == list:
