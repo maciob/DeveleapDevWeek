@@ -2,9 +2,9 @@
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
-# from openpyxl import load_workbook
 import socket
 from flask import send_file
+
 
 def get_ip():
     hostname = socket.gethostname()
@@ -13,7 +13,8 @@ def get_ip():
     last_digit = int(temp_list[3]) + 1
     temp_list[3] = str(last_digit)
     new_IP = ".".join(temp_list)
-    return(IPAddr,new_IP)
+    return (IPAddr, new_IP)
+
 
 app = Flask(__name__)
 
@@ -35,12 +36,14 @@ def run():
 def home():
     return render_template("index.html")
 
-@app.route("/monitor", methods=["GET","POST"])
+
+@app.route("/monitor", methods=["GET", "POST"])
 def monitor():
     if request.method == "POST":
         return jsonify(status=200)
-    else:
+    elif request.method == "GET":
         return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor </br>"
+
 
 @app.route("/health", methods=["GET"])
 def health():
@@ -67,7 +70,7 @@ def add_provider():
         data = cur.fetchall()
         return render_template("provider.html", providers=data, title="Add provider")
 
-    else:
+    elif request.method == "POST":
         name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
@@ -102,7 +105,8 @@ def update_provider(id):
 
 @app.route("/ip", methods=["GET"])
 def ip():
-    return (f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}")
+    return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+
 
 @app.route("/ipdb", methods=["GET"])
 def ipdb():
