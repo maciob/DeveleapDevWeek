@@ -2,19 +2,21 @@
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
-# from openpyxl import load_workbook
 import socket
 from flask import send_file
 from datetime import datetime
 import requests
 
 
-hostname = socket.gethostname()
-IPAddr = socket.gethostbyname(hostname)
-temp_list = IPAddr.split(".")
-last_digit = int(temp_list[3]) + 1
-temp_list[3] = str(last_digit)
-new_IP = ".".join(temp_list)
+def get_ip():
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    temp_list = IPAddr.split(".")
+    last_digit = int(temp_list[3]) + 1
+    temp_list[3] = str(last_digit)
+    new_IP = ".".join(temp_list)
+    return (IPAddr, new_IP)
+
 
 app = Flask(__name__)
 
@@ -22,7 +24,7 @@ mysql = MySQL()
 app.config["MYSQL_DATABASE_USER"] = "app"
 app.config["MYSQL_DATABASE_PASSWORD"] = "pass"
 app.config["MYSQL_DATABASE_DB"] = "billdb"
-app.config["MYSQL_DATABASE_HOST"] = f"{new_IP}"
+app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
 mysql.init_app(app)
 
 dependiences = {"Database": "Unknown"}
@@ -36,19 +38,21 @@ def run():
 def home():
     return render_template("index.html")
 
-@app.route("/monitor", methods=["GET","POST"])
+
+@app.route("/monitor", methods=["GET", "POST"])
 def monitor():
     if request.method == "POST":
         return jsonify(status=200)
-    else:
-        return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor"
+    elif request.method == "GET":
+        return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor </br>"
+
 
 @app.route("/health", methods=["GET"])
 def health():
     try:
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider")
+        cur.execute(f"SELECT 1;")
         data = cur.fetchone()
         if data:
             dependiences["Database"] = "OK"
@@ -56,13 +60,6 @@ def health():
     except:
         dependiences["Database"] = "DOWN"
         return dependiences
-    # DO NOT DELETE COMMENTS BELOW  - ITS ANOTHER VERSION, MAYBE FOR FUTURE USAGE :)
-    # if data:
-    #     dependiences["Database"] = "OK"
-    #     return dependiences
-    # else:
-    #     dependiences["Database"] = "DOWN"
-    #     return dependiences
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -75,7 +72,7 @@ def add_provider():
         data = cur.fetchall()
         return render_template("provider.html", providers=data, title="Add provider")
 
-    else:
+    elif request.method == "POST":
         name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
@@ -110,17 +107,13 @@ def update_provider(id):
 
 @app.route("/ip", methods=["GET"])
 def ip():
-    # resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
-    # return "</br>".join(resp)
-    hostname = socket.gethostname()
-    IPAddr = socket.gethostbyname(hostname)
-    temp_list = IPAddr.split(".")
-    last_digit = int(temp_list[3]) + 1
-    temp_list[3] = str(last_digit)
-    new_IP = ".".join(temp_list)
-    return (
-        f"Your flask app IP address is {IPAddr}, and DB server IP address is {new_IP}"
-    )
+    return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+
+
+@app.route("/ipdb", methods=["GET"])
+def ipdb():
+    data = get_ip()[1]
+    return jsonify(data)
 
 
 @app.route("/truck", methods=["POST", "GET"])  # GET added for testing
