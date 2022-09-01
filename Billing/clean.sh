@@ -1,4 +1,5 @@
 #!/bin/bash
 
-docker rm -f flask_server db_server
-docker network rm billing_network
+docker rm -f mysql-flask-app-container python-flask-app-container
+
+echo "Done."
