@@ -84,7 +84,7 @@ def health_post():
                         response_codes.append(f'Service at port {str(p)} is DOWN. Service is Monitor.')
 
                     case "8089":
-                        response_codes.append(f'Service at port {str(p)} is UP. Service is GithubTracker/CI.')
+                        response_codes.append(f'Service at port {str(p)} is DOWN. Service is GithubTracker/CI.')
 
 
     return render_template('monitor.html', response_codes=response_codes)
