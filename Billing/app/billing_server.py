@@ -82,12 +82,11 @@ def add_provider():
         else:
             cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
             conn.commit()
-
-        conn = mysql.connect()
-        cur = conn.cursor()
-        cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
-        data = cur.fetchone()
-        return str(data)
+            conn = mysql.connect()
+            cur = conn.cursor()
+            cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
+            data = cur.fetchone()
+            return jsonify(id=data)
 
 
 @app.route("/provider/<id>", methods=["PUT"])
@@ -104,7 +103,7 @@ def update_provider(id):
         cur = conn.cursor()
         cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
         data = cur.fetchone()
-        return str(data)
+        return jsonify(data)
 
 
 @app.route("/ip", methods=["GET"])
@@ -133,6 +132,7 @@ def add_truck():
         cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
         trucks = cur.fetchall()
         return str(trucks)
+
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
