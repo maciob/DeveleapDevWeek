@@ -40,8 +40,7 @@ def batch_weight():
 
 @app.route("/unknown",methods=["GET"])
 def unknown(): 
-    # Returns a list of all recorded containers that have unknown weight:
-    # ["id1","id2",...]
+    
     if request.method == "GET":
         users = []
         conn = mysql.connect()
@@ -57,41 +56,57 @@ def unknown():
         return jsonpickle.encode(users)
 
 @app.route("/item/<id>",methods=["GET"])
-def item(id): 
-    # GET /item/<id>
-    # GET /item/<id>?from=t1&to=t2
-    # - id is for an item (truck or container). 404 will be returned if non-existent
-    # - t1,t2 - date-time stamps, formatted as yyyymmddhhmmss. server time is assumed.
-    # default t1 is "1st of month at 000000". default t2 is "now". 
-
+def item(id,t1,t2): 
+    
     if request.method == "GET":
         # users = user list from /unknown page
         if id in users:
             conn = mysql.connect()
             cursor = conn.cursor()
-            query = "SELECT * from <table_name> WHERE UserId = 'id' "
+            query = "SELECT id,tara,sessions from <table_name> WHERE UserId = 'id' "
             cursor.execute(query)            
-            the_user = cur.fetchone()
+            the_user = cur.fetchall()
             conn.close()
+            
+            x = datetime.datetime.now()
+            t_1 = datetime.datetime(x.year,x.month,1).strftime("%Y%m%d%H%M%S")
+            t_2 = x.strftime("%Y%m%d%H%M%S") # current time
+            
+            t1 = request.args.get('t1', t_1)
+            t2 = request.args.get('t2', t_2)
             
             return jsonpickle.encode(the_user)
 
-
-        # Returns a json:
-        # { "id": <str>,
-        #   "tara": <int> OR "na", // for a truck this is the "last known tara"
-        #   "sessions": [ <id1>,...] 
-        # }
     else:
         # return render_template('404.html')
-        
-        # @main.app_errorhandler(404) def page_not_found(e):
-        # if request.accept_mimetypes.accept_json and \ not request.accept_mimetypes.accept_html:
-        # response = jsonify({'error': 'not found'}) response.status_code = 404
-        # return response
-        # return render_template('404.html'), 404
-
         return None
+
+@app.route("/weight",methods=["GET"])
+def weight(t1,t2, f): 
+    if request.method == "GET":
+        
+        x = datetime.datetime.now()
+        t_1 = datetime.datetime(x.year,x.month,x.day).strftime("%Y%m%d%H%M%S") # server time
+        t_2 = x.strftime("%Y%m%d%H%M%S") # current time
+        
+        filter = request.args.get('filter', default = "in,out,none", type = str)
+        t1 = request.args.get('t1', default = t_1, type = int)
+        t2 = request.args.get('t2', default = t_2, type = int)
+        
+        
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        query = "SELECT * from <table_name> WHERE direction = 'the_filter' "
+        cursor.execute(query)            
+        the_object = cur.fetchone()
+        conn.close()  
+            
+        return jsonpickle.encode(the_object)
+    
+    else:
+        # return render_template(index.html) 
+        return None
+    
     
 @app.route("/session/<id>",methods=["GET"])
 def sessionid(id):
