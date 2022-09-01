@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
+from asyncio import proactor_events
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
-# from openpyxl import load_workbook
 import socket
 from flask import send_file
+from datetime import datetime
+import requests
 
 
-hostname = socket.gethostname()
-IPAddr = socket.gethostbyname(hostname)
-temp_list = IPAddr.split(".")
-last_digit = int(temp_list[3]) + 1
-temp_list[3] = str(last_digit)
-new_IP = ".".join(temp_list)
+def get_ip():
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    temp_list = IPAddr.split(".")
+    last_digit = int(temp_list[3]) + 1
+    temp_list[3] = str(last_digit)
+    new_IP = ".".join(temp_list)
+    return (IPAddr, new_IP)
+
 
 app = Flask(__name__)
 
@@ -20,7 +25,7 @@ mysql = MySQL()
 app.config["MYSQL_DATABASE_USER"] = "app"
 app.config["MYSQL_DATABASE_PASSWORD"] = "pass"
 app.config["MYSQL_DATABASE_DB"] = "billdb"
-app.config["MYSQL_DATABASE_HOST"] = f"{new_IP}"
+app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
 mysql.init_app(app)
 
 dependiences = {"Database": "Unknown"}
@@ -34,19 +39,21 @@ def run():
 def home():
     return render_template("index.html")
 
-@app.route("/monitor", methods=["GET","POST"])
+
+@app.route("/monitor", methods=["GET", "POST"])
 def monitor():
     if request.method == "POST":
         return jsonify(status=200)
-    else:
-        return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor"
+    elif request.method == "GET":
+        return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor </br>"
+
 
 @app.route("/health", methods=["GET"])
 def health():
     try:
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider")
+        cur.execute(f"SELECT 1;")
         data = cur.fetchone()
         if data:
             dependiences["Database"] = "OK"
@@ -54,13 +61,6 @@ def health():
     except:
         dependiences["Database"] = "DOWN"
         return dependiences
-    # DO NOT DELETE COMMENTS BELOW  - ITS ANOTHER VERSION, MAYBE FOR FUTURE USAGE :)
-    # if data:
-    #     dependiences["Database"] = "OK"
-    #     return dependiences
-    # else:
-    #     dependiences["Database"] = "DOWN"
-    #     return dependiences
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -73,7 +73,7 @@ def add_provider():
         data = cur.fetchall()
         return render_template("provider.html", providers=data, title="Add provider")
 
-    else:
+    elif request.method == "POST":
         name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
@@ -108,30 +108,33 @@ def update_provider(id):
 
 @app.route("/ip", methods=["GET"])
 def ip():
-    # resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
-    # return "</br>".join(resp)
-    hostname = socket.gethostname()
-    IPAddr = socket.gethostbyname(hostname)
-    temp_list = IPAddr.split(".")
-    last_digit = int(temp_list[3]) + 1
-    temp_list[3] = str(last_digit)
-    new_IP = ".".join(temp_list)
-    return (
-        f"Your flask app IP address is {IPAddr}, and DB server IP address is {new_IP}"
-    )
+    return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+
+
+@app.route("/ipdb", methods=["GET"])
+def ipdb():
+    data = get_ip()[1]
+    return jsonify(data)
 
 
 @app.route("/truck", methods=["POST", "GET"])  # GET added for testing
 def add_truck():
     if request.method == "POST":
-        truck_id = request.form["truck_id"]
+        truck_id = request.form["id"]
+        provider_id = request.form["provider"]
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO Trucks (`id`) VALUES ('{truck_id}');")
+        if len(truck_id)>11:
+            return "Truck ID too long. Try again.\n"
+        elif cur.execute(f"SELECT * FROM Trucks WHERE id = '{truck_id}';"):
+            return "Truck's ID already in the database. Try again.\n"
+        elif not cur.execute(f"SELECT * FROM Provider WHERE id = '{provider_id}';"):
+            return "Provider's ID not in the database. Try again. \n"
+        cur.execute(f"INSERT INTO Trucks (id, provider_id) VALUES ('{truck_id}', '{provider_id}');")
         conn.commit()
         cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
-        trucks = cur.fetchall()
-        return str(trucks)
+        trucks = cur.fetchone()
+        return jsonify(trucks)
 
     elif request.method == "GET":
         conn = mysql.connect()
@@ -139,17 +142,35 @@ def add_truck():
         cur.execute(f"SELECT * FROM Trucks;")
         conn.commit()
         trucks = cur.fetchall()
-        return str(trucks)
+        return jsonify(trucks)
 
 
-@app.route("/truck/<id>", methods=["PUT"])
+@app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
-    provider_id = request.form["provider_id"]
-    conn = mysql.connect()
-    cur = conn.cursor()
-    cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
-    conn.commit()
-    return "OK"
+    if request.method == 'PUT':
+        provider_id = request.form["provider"]
+        conn = mysql.connect()
+        cur = conn.cursor()
+        if not cur.execute(f"SELECT * FROM Provider WHERE id = '{provider_id}';"):
+            return "No provider with this ID in database.\n"
+        elif not cur.execute(f"SELECT * FROM Trucks WHERE id = '{id}';"):
+            return "No truck with this ID in database.\n"
+        cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
+        conn.commit()
+        return "OK"
+    if request.method == 'GET':
+        now = datetime.now()
+        month = now.strftime('%m')
+        year = now.strftime('%Y')
+        current_time = now.strftime("%Y%m%d%H%M%S")
+        truck_id = id
+        t1 = request.form.get("t1", f'{year}01{month}000000')
+        t2 = request.form.get("t2", current_time)
+        #weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
+        weight_response={'id': truck_id,  't1': t1, 't2': t2}
+        return jsonify(weight_response)
+
+    
 
 
 @app.route("/rates", methods=["POST", "GET"])
