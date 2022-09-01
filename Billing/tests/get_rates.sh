@@ -6,7 +6,7 @@ popd > /dev/null
 
 sleep 2
 
-curl localhost:8086/health | grep -a "OK" &>/dev/null
+curl -i localhost:8086/rates | tac | tac | grep -a "200" &>/dev/null
 if [ $? == 0 ]; then
     echo "Passed."
 else
