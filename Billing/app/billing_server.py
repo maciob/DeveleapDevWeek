@@ -136,13 +136,15 @@ def add_truck():
         provider_id = request.form["provider"]
         conn = mysql.connect()
         cur = conn.cursor()
-        if len(truck_id)>11:
+        if len(truck_id) > 11:
             return "Truck ID too long. Try again.\n"
         elif cur.execute(f"SELECT * FROM Trucks WHERE id = '{truck_id}';"):
             return "Truck's ID already in the database. Try again.\n"
         elif not cur.execute(f"SELECT * FROM Provider WHERE id = '{provider_id}';"):
             return "Provider's ID not in the database. Try again. \n"
-        cur.execute(f"INSERT INTO Trucks (id, provider_id) VALUES ('{truck_id}', '{provider_id}');")
+        cur.execute(
+            f"INSERT INTO Trucks (id, provider_id) VALUES ('{truck_id}', '{provider_id}');"
+        )
         conn.commit()
         cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
         trucks = cur.fetchone()
@@ -163,7 +165,7 @@ def add_truck():
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
-    if request.method == 'PUT':
+    if request.method == "PUT":
         provider_id = request.form["provider"]
         conn = mysql.connect()
         cur = conn.cursor()
@@ -171,24 +173,24 @@ def updadate_(id):
             return "No provider with this ID in database.\n"
         elif not cur.execute(f"SELECT * FROM Trucks WHERE id = '{id}';"):
             return "No truck with this ID in database.\n"
-        cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
+        cur.execute(
+            f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';"
+        )
         conn.commit()
         cur.close()
         conn.close()
         return "OK"
-    if request.method == 'GET':
+    if request.method == "GET":
         now = datetime.now()
-        month = now.strftime('%m')
-        year = now.strftime('%Y')
+        month = now.strftime("%m")
+        year = now.strftime("%Y")
         current_time = now.strftime("%Y%m%d%H%M%S")
         truck_id = id
-        t1 = request.form.get("t1", f'{year}01{month}000000')
+        t1 = request.form.get("t1", f"{year}01{month}000000")
         t2 = request.form.get("t2", current_time)
-        #weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
-        weight_response={'id': truck_id,  't1': t1, 't2': t2}
+        # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
+        weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return jsonify(weight_response)
-
-    
 
 
 @app.route("/rates", methods=["POST", "GET"])
@@ -214,7 +216,6 @@ def rates():
         conn = mysql.connect()
         cur = conn.cursor()
         for i in range(len(data.index)):
-            
 
             cur.execute(
                 f"INSERT INTO Rates (product_id, rate, scope) VALUES ('{data.iloc[i,0]}','{data.iloc[i,1]}','{data.iloc[i,2]}');"
@@ -222,7 +223,7 @@ def rates():
             conn.commit()
         cur.close()
         conn.close()
-    
+
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"SELECT * FROM Rates;")
