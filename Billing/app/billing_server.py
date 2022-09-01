@@ -57,6 +57,8 @@ def health():
         data = cur.fetchone()
         if data:
             dependiences["Database"] = "OK"
+            cur.close()
+            conn.close()
             return dependiences
     except:
         dependiences["Database"] = "DOWN"
@@ -71,6 +73,8 @@ def add_provider():
         cur = conn.cursor()
         cur.execute(f"SELECT * FROM Provider")
         data = cur.fetchall()
+        cur.close()
+        conn.close()
         return render_template("provider.html", providers=data, title="Add provider")
 
     elif request.method == "POST":
@@ -78,6 +82,8 @@ def add_provider():
         conn = mysql.connect()
         cur = conn.cursor()
         if cur.execute(f"SELECT * FROM Provider WHERE name = '{name}';"):
+            cur.close()
+            conn.close()
             return "Name already in database. Try again.\n"
         else:
             cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
@@ -86,6 +92,8 @@ def add_provider():
             cur = conn.cursor()
             cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
             data = cur.fetchone()
+            cur.close()
+            conn.close()
             return jsonify(id=data)
 
 
@@ -95,6 +103,8 @@ def update_provider(id):
     conn = mysql.connect()
     cur = conn.cursor()
     if not cur.execute(f"SELECT * FROM Provider WHERE id = '{id}';"):
+        cur.close()
+        conn.close()
         return "No provider with this ID in database.\n"
     else:
         cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
@@ -103,6 +113,8 @@ def update_provider(id):
         cur = conn.cursor()
         cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
         data = cur.fetchone()
+        cur.close()
+        conn.close()
         return jsonify(data)
 
 
@@ -134,6 +146,8 @@ def add_truck():
         conn.commit()
         cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
         trucks = cur.fetchone()
+        cur.close()
+        conn.close()
         return jsonify(trucks)
 
     elif request.method == "GET":
@@ -142,6 +156,8 @@ def add_truck():
         cur.execute(f"SELECT * FROM Trucks;")
         conn.commit()
         trucks = cur.fetchall()
+        cur.close()
+        conn.close()
         return jsonify(trucks)
 
 
@@ -157,6 +173,8 @@ def updadate_(id):
             return "No truck with this ID in database.\n"
         cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
         conn.commit()
+        cur.close()
+        conn.close()
         return "OK"
     if request.method == 'GET':
         now = datetime.now()
@@ -190,20 +208,27 @@ def rates():
         cur = conn.cursor()
         cur.execute(f"DELETE FROM Rates;")
         conn.commit()
+        cur.close()
+        conn.close()
 
+        conn = mysql.connect()
+        cur = conn.cursor()
         for i in range(len(data.index)):
-            conn = mysql.connect()
-            cur = conn.cursor()
+            
 
             cur.execute(
                 f"INSERT INTO Rates (product_id, rate, scope) VALUES ('{data.iloc[i,0]}','{data.iloc[i,1]}','{data.iloc[i,2]}');"
             )
             conn.commit()
+        cur.close()
+        conn.close()
     
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute(f"SELECT * FROM Rates;")
         data = cur.fetchall()
+        cur.close()
+        conn.close()
         return "Inserted into DB successfully"
 
 
