@@ -1,10 +1,10 @@
 #!/bin/bash
 
-pushd ../ > /dev/null
-command ./init.sh "test"
-popd > /dev/null
+# pushd ../ > /dev/null
+# command ./init.sh "test"
+# popd > /dev/null
 
-sleep 2
+# sleep 2
 
 curl -d "username=test_when user does not_exist" -X PUT localhost:8086/provider/99 | tac | tac | grep -a "No provider" &>/dev/null
 if [ $? == 0 ]; then

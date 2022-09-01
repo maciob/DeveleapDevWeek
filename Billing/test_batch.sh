@@ -1,0 +1,30 @@
+#!/bin/bash
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+green='\e[1;32m'
+red='\e[1;31m'
+white='\e[0m'
+
+command ./init.sh "test"
+
+sleep 5
+
+pushd ./tests > /dev/null
+    command ./get_health.sh >> output.txt
+    command ./get_monitor.sh >> output.txt
+    command ./get_rates.sh >> output.txt
+    command ./post_provider.sh >> output.txt
+    command ./put_provider_id.sh >> output.txt
+    passed_count=$(grep -c "Passed" output.txt)
+    if [ $passed_count -eq 0 ]; then
+        echo -e "\n${bold}${red}Oh...$passed_count/6 tests passed.${white}${normal}\n"
+    elif [ $passed_count -le 3 ]; then
+        echo -e "\n${bold}${red}Only $passed_count/6 tests passed. Try fixing the bugs.${white}${normal}\n"
+    elif [ $passed_count -le 5 ]; then
+        echo -e "\n${bold}${red}$passed_count/6 tests passed. Almost all tests are passed. Try harder!${white}${normal}\n"
+    elif [ $passed_count -eq 6 ]; then
+        echo -e "\n${bold}${green}$passed_count/6 tests passed! Great job!${white}${normal}\n"
+    fi
+    rm -f output.txt
+popd > /dev/null
