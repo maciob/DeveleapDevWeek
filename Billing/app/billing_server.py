@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from asyncio import proactor_events
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
@@ -126,14 +127,21 @@ def ip():
 @app.route("/truck", methods=["POST", "GET"])  # GET added for testing
 def add_truck():
     if request.method == "POST":
-        truck_id = request.form["truck_id"]
+        truck_id = request.form["id"]
+        provider_id = request.form["provider"]
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO Trucks (`id`) VALUES ('{truck_id}');")
+        if len(truck_id)>11:
+            return "Truck ID too long. Try again.\n"
+        elif cur.execute(f"SELECT * FROM Trucks WHERE id = '{truck_id}';"):
+            return "Truck's ID already in the database. Try again.\n"
+        elif not cur.execute(f"SELECT * FROM Provider WHERE id = '{provider_id}';"):
+            return "Provider's ID not in the database. Try again. \n"
+        cur.execute(f"INSERT INTO Trucks (id, provider_id) VALUES ('{truck_id}', '{provider_id}');")
         conn.commit()
         cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
-        trucks = cur.fetchall()
-        return str(trucks)
+        trucks = cur.fetchone()
+        return jsonify(trucks)
 
     elif request.method == "GET":
         conn = mysql.connect()
@@ -141,15 +149,19 @@ def add_truck():
         cur.execute(f"SELECT * FROM Trucks;")
         conn.commit()
         trucks = cur.fetchall()
-        return str(trucks)
+        return jsonify(trucks)
 
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
     if request.method == 'PUT':
-        provider_id = request.form["provider_id"]
+        provider_id = request.form["provider"]
         conn = mysql.connect()
         cur = conn.cursor()
+        if not cur.execute(f"SELECT * FROM Provider WHERE id = '{provider_id}';"):
+            return "No provider with this ID in database.\n"
+        elif not cur.execute(f"SELECT * FROM Trucks WHERE id = '{id}';"):
+            return "No truck with this ID in database.\n"
         cur.execute(f"UPDATE Trucks SET provider_id = '{provider_id}' WHERE id = '{id}';")
         conn.commit()
         return "OK"
