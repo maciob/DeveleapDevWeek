@@ -1,6 +1,8 @@
 from contextlib import closing
-from flask import Flask
+from flask import Flask, render_template
 import socket
+import requests
+
 
 app = Flask(__name__)
 HOST = "localhost"
@@ -18,6 +20,21 @@ def home():
             else:
                 port_list.append(f"<li>Service at port {str(port)} is down </li><br>")
     return "".join(port_list)
+
+
+@app.route("/health-post")
+def health_post():
+
+    post_ports = [8080, 8082, 8084, 8086, 8088, 8089]
+    response_codes = []
+    msg = "Hello"
+    for p in post_ports:
+        try:
+            requests.post(f"http://18.170.241.119:{p}/monitor", msg)
+            response_codes.append(f"Port {p} is running.")
+        except:
+            response_codes.append(f"Port {p} is not running.")
+    return render_template('monitor.html', response_codes=response_codes)
 
 
 if __name__ == "__main__":
