@@ -1,6 +1,6 @@
 from locale import format_string
 from logging import root
-from flask import Flask,render_template, request
+from flask import Flask,render_template, request, jsonify
 from datetime import datetime
 from flaskext.mysql import MySQL
 from datetime import datetime
@@ -159,18 +159,12 @@ def handling_files(file):
     extract_data()
     
 
-
-
-
-
-
-
-
-
-
-
-
-
+@app.route("/monitor", methods=["GET","POST"])
+def monitor():
+    if request.method == "POST":
+        return jsonify(status=200)
+    else:
+        return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8080/monitor"
 
 
 
