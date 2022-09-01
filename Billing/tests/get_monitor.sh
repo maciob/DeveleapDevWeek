@@ -6,7 +6,7 @@
 
 # sleep 2
 
-curl localhost:8086/health | grep -a "OK" &>/dev/null
+curl localhost:8086/monitor | tac | tac | grep -a "example" &>/dev/null
 if [ $? == 0 ]; then
     echo "Passed."
 else
