@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
-from openpyxl import load_workbook
+# from openpyxl import load_workbook
 import socket
 from flask import send_file
 from datetime import datetime
@@ -37,6 +36,12 @@ def run():
 def home():
     return render_template("index.html")
 
+@app.route("/monitor", methods=["GET","POST"])
+def monitor():
+    if request.method == "POST":
+        return jsonify(status=200)
+    else:
+        return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor"
 
 @app.route("/health", methods=["GET"])
 def health():
@@ -69,18 +74,21 @@ def add_provider():
         cur.execute(f"SELECT * FROM Provider")
         data = cur.fetchall()
         return render_template("provider.html", providers=data, title="Add provider")
+
     else:
         name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
-        conn.commit()
-
-        conn = mysql.connect()
-        cur = conn.cursor()
-        cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
-        data = cur.fetchone()
-        return str(data)
+        if cur.execute(f"SELECT * FROM Provider WHERE name = '{name}';"):
+            return "Name already in database. Try again.\n"
+        else:
+            cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
+            conn.commit()
+            conn = mysql.connect()
+            cur = conn.cursor()
+            cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
+            data = cur.fetchone()
+            return jsonify(id=data)
 
 
 @app.route("/provider/<id>", methods=["PUT"])
@@ -88,14 +96,16 @@ def update_provider(id):
     name = request.form["username"]
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
-    conn.commit()
-
-    conn = mysql.connect()
-    cur = conn.cursor()
-    cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
-    data = cur.fetchone()
-    return str(data)
+    if not cur.execute(f"SELECT * FROM Provider WHERE id = '{id}';"):
+        return "No provider with this ID in database.\n"
+    else:
+        cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
+        conn.commit()
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
+        data = cur.fetchone()
+        return jsonify(data)
 
 
 @app.route("/ip", methods=["GET"])
@@ -124,6 +134,7 @@ def add_truck():
         cur.execute(f"SELECT id,provider_id FROM Trucks WHERE id = '{truck_id}';")
         trucks = cur.fetchall()
         return str(trucks)
+
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
