@@ -32,8 +32,11 @@ def list():
     lista.append(before)
     lista.append(after)
     lista.append(branch)
-    os.system("docker ps -a")
-    time.sleep(20)  # testingphase
+    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
+    os.system("docker build -t mysql_db:1.0  db/.")
+    os.system("docker build -t billing_server:1.0 app/.")
+    os.system("command docker-compose --env-file ./config/.env.prod up --detach")
+    #docker rm -f mysql-flask-app-container python-flask-app-container
     lock.release()
     return jsonify(success=True)
 
