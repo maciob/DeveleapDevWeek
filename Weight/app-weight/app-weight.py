@@ -9,16 +9,24 @@ import json
 import mysql.connector
 
 app = Flask(__name__)
-# mysql = MySQL()
-# app.config['MYSQL_DATABASE_USER'] = 'app'
-# app.config['MYSQL_DATABASE_PASSWORD'] = 'pass'
-# app.config['MYSQL_DATABASE_DB'] = 'mydb'
-# app.config['MYSQL_DATABASE_HOST'] = '172.17.0.3'
-# mysql.init_app(app)
+
+def getMysqlConnection():
+    return mysql.connector.connect(user='root', host='mysqlcont', port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
+
+
+
+
+
+
+
 
 @app.route("/",methods=["GET"])
 def home():
-    return "<h1>Hello!<h1> This is the main page of the weight team app!"
+    db = getMysqlConnection()
+    cur = db.cursor()
+    data = cur.execute("SELECT * FROM containers_registered")
+    data = cur.fetchall()
+    return render_template('index.html', content=data)
     
 @app.route("/weight ",methods=["POST"])
 def weight(): 
@@ -44,7 +52,7 @@ def unknown():
     # ["id1","id2",...]
     if request.method == "GET":
         users = []
-        conn = mysql.connect()
+        conn =  getMysqlConnection()
         cursor = conn.cursor()
         query = 'SELECT UserId from <table_name>'
         cursor.execute(query)
@@ -67,11 +75,11 @@ def item(id):
     if request.method == "GET":
         # users = user list from /unknown page
         if id in users:
-            conn = mysql.connect()
+            conn = getMysqlConnection()
             cursor = conn.cursor()
             query = "SELECT * from <table_name> WHERE UserId = 'id' "
             cursor.execute(query)            
-            the_user = cur.fetchone()
+            the_user = cursor.fetchone()
             conn.close()
             
             return jsonpickle.encode(the_user)
@@ -95,7 +103,7 @@ def item(id):
     
 @app.route("/session/<id>",methods=["GET"])
 def sessionid(id):
-    s1 = mysql.connect()
+    s1 = getMysqlConnection()
     cur = s1.cursor()
     query = """select * from containers_registered where container_id = %s"""
     tuple1 = id
@@ -107,7 +115,7 @@ def sessionid(id):
 def testdb():
     
     try:
-        conn = mysql.connect()
+        conn = getMysqlConnection()
         cur = conn.cursor()
         cur.execute("select * from containers_registered")
         results = cur.fetchall()
@@ -119,7 +127,7 @@ def testdb():
         return thisdict
     
 def handling_files(file):
-    conn = mysql.connect()
+    conn = getMysqlConnection()
     cur = conn.cursor()
     input = file
     index = input.index(".")
@@ -169,5 +177,5 @@ def monitor():
 
 
 if __name__ == "__main__":
-	app.run()
+	app.run(debug=True, host='0.0.0.0', port=5000)
  
