@@ -4,14 +4,14 @@ services:
     image: billing_server:1.0
     container_name: python-flask-app-container
     ports:
-     - "8086:5000"
+     - "${PORT_SERVER}:5000"
     volumes:
      - ./app/in:/app/in
-  mysql:
+  mysql-flask-app-container:
     image: mysql_db:1.0
     container_name: mysql-flask-app-container
     ports:
-      - "8087:3306"
+      - "${PORT_DB}:3306"
     volumes:
       - ./db_volume:/var/lib/mysql
     depends_on:
