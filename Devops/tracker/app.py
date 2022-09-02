@@ -74,13 +74,13 @@ def continuous_integration():
 #    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
 #    os.system("rm -r git")
 #    os.system("mkdir git")
-    if test_result == True:
-        os.system(f"git checkout {br}")
-        os.system(f"git merge {after}")
-        os.system(f"git push origin {branch}")
-        send_email(f"Commit on branch {branch} - tests passed.", f"Bravo {committer_mail}! Tests results:", committer_mail)
-    else:
-        send_email(f"Commit on branch {branch} - tests not passed.", f"Sorry {committer_mail}, Tests results:", committer_mail)
+#     if test_result == True:
+#         os.system(f"git checkout {br}")
+#         os.system(f"git merge {after}")
+#         os.system(f"git push origin {branch}")
+#         send_email(f"Commit on branch {branch} - tests passed.", f"Bravo {committer_mail}! Tests results:", committer_mail)
+#     else:
+#         send_email(f"Commit on branch {branch} - tests not passed.", f"Sorry {committer_mail}, Tests results:", committer_mail)
     lock.release()
 
     return jsonify(success=True)
