@@ -5,8 +5,10 @@
 # popd > /dev/null
 
 # sleep 2
-
-curl 18.170.241.119:8086/health | grep -a "OK" &>/dev/null
+echo " "
+echo $0
+echo " "
+curl 18.170.241.119:8086/health | grep -a "OK" 
 if [ $? == 0 ]; then
     echo "Passed."
 else

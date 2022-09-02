@@ -1,11 +1,36 @@
+ 
+./get_health.sh
+ 
+{"Database":"OK"}
 Passed.
+ 
+./get_monitor.sh
+ 
+<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor </br>
 Passed.
+ 
+./get_rates.sh
+ 
 Failed.
+ 
+./post_provider.sh
+ 
+Name already in database. Try again.
 Passed.
+ 
+./put_provider_id.sh
+ 
+No provider with this ID in database.
 Passed when user does not exist.
 Failed.
+ 
+./post_get_truck.sh
+ 
 HTTP/1.1 200 OK
 Passed when we want to add new truck.
 HTTP/1.1 200 OK
 Passed when we want to get trucks data
+ 
+./post_rates.sh
+ 
 Failed.

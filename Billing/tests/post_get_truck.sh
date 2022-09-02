@@ -5,6 +5,9 @@
 # popd > /dev/null
 
 # sleep 2
+echo " "
+echo $0
+echo " "
 
 curl -i -d "provider=10005" -d "id=789098" -X POST 18.170.241.119:8086/truck | tac | tac | grep -a "200"
 
