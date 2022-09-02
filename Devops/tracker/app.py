@@ -41,7 +41,7 @@ def list():
     os.system('echo "docker build billing"')
     os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
     os.system('echo "docker compose up"')
-    os.system("docker compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
+    os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
     time.sleep(20)
     os.system('echo "run the tests"')
     os.system("./git/Billing/test_batch.sh")
