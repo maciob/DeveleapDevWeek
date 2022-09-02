@@ -75,7 +75,7 @@ def continuous_integration():
 
 
 def send_email(subject, message, receiver_mail):
-
+    global mailing_list
     #  sends an email with feedback to committer, team leaders and devops team
     os.system('echo "tu tez bylem"')
     msg = MIMEText(message, 'plain')
