@@ -39,7 +39,7 @@ def continuous_integration():
     lista.append(after)
     lista.append(branch)
     os.system("docker rm -f mysql-flask-app-container python-flask-app-container") 
-    branch_name = re.search(r'/[a-zA-Z]+g', branch).group()
+    branch_name = re.search(r'/[a-zA-Z]+g', branch).group(0)
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
     os.system('echo "docker rm"')
@@ -54,10 +54,12 @@ def continuous_integration():
     os.system('echo "run the tests"')
     test_result = os.system("./git/Billing/test_batch.sh")
     os.system('echo "docker rm"')
+
     subject_pass = f"Commit on branch {branch_name} - tests passed."
     subject_fail = f"Commit on branch {branch_name} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
     message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
+
     if test_result == 100:
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
