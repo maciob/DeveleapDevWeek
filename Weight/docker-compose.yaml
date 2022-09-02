@@ -25,3 +25,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: weight
+  volumes:
+    flask_app_volume:
+      name: flask_app_volume
