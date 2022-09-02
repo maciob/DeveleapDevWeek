@@ -22,7 +22,8 @@ Passed.
  
 No provider with this ID in database.
 Passed when user does not exist.
-Failed.
+[10001,"test_when user_exists"]
+Passed when user exists.
  
 ./post_get_truck.sh
  

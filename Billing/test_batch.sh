@@ -7,8 +7,8 @@ red='\e[1;31m'
 white='\e[0m'
 
 
-pushd ./git/Billing/tests > /dev/null
-    command sudo rm -f output.txt
+pushd app/git/Billing/tests > /dev/null
+    command rm -f output.txt
     command ./get_health.sh >> output.txt
     command ./get_monitor.sh >> output.txt
     command ./get_rates.sh >> output.txt

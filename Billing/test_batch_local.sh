@@ -7,7 +7,7 @@ red='\e[1;31m'
 white='\e[0m'
 
 # command ./init.sh "test"
-command sudo rm -f output.txt
+
 
 pushd ./tests > /dev/null
     command sudo rm -f output.txt
