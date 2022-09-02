@@ -10,7 +10,7 @@ command ./init.sh "test"
 
 sleep 5
 
-pushd ./tests > /dev/null
+pushd ./git/Billing/tests > /dev/null
     command ./get_health.sh >> output.txt
     command ./get_monitor.sh >> output.txt
     command ./get_rates.sh >> output.txt
