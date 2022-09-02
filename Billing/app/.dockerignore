@@ -1,4 +1,4 @@
 *.md
 */*/Dockerfile*
 */*/requirements*
-./in
+in/
