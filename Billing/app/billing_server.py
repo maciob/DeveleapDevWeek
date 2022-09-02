@@ -200,12 +200,11 @@ def rates():
         # book = load_workbook("in/rates.xlsx")
         # sheet = book.active
         # return render_template("s3_excel_table.html", sheet=sheet)
-        path = f"/in/rates.xlsx"
+        path = r'/app/in/rates.xlsx'
         return send_file(path, as_attachment=True)
 
     elif request.method == "POST":
-        os.system('echo $("ls -la")')
-        excel_data = pd.read_excel(f"/in/rates.xlsx")
+        excel_data = pd.read_excel(r'/app/in/rates.xlsx')
         # Read the values of the file in the dataframe
         data = pd.DataFrame(excel_data, columns=["Product", "Rate", "Scope"])
         conn = mysql.connect()
