@@ -58,6 +58,7 @@ def continuous_integration():
     lista.append(after)
     lista.append(branch)
     br = re.search(r'/[a-zA-Z]+g', branch)
+    os.system("docker rm -f mysql-flask-app-container python-flask-app-container") 
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
     os.system('echo "docker rm"')
@@ -76,7 +77,6 @@ def continuous_integration():
     os.system('echo "run the tests"')
     os.system("./git/Billing/test_batch.sh")
     os.system('echo "docker rm"')
-#    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
 #    os.system("rm -r git")
 #    os.system("mkdir git")
 #     if test_result == True:
