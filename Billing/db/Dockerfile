@@ -4,4 +4,4 @@ ENV MYSQL_DATABASE billdb
 ENV MYSQL_USER app 
 ENV MYSQL_PASSWORD pass
 RUN env
-ADD billingdb.sql /docker-entrypoint-initdb.d
+ADD git/Billing/db/billingdb.sql /docker-entrypoint-initdb.d
