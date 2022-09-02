@@ -57,7 +57,7 @@ def continuous_integration():
     lista.append(before)
     lista.append(after)
     lista.append(branch)
-    br = re.search(r'/[a-zA-Z]+g', branch)
+    branch_name = re.search(r'/[a-zA-Z]+g', branch).group()
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
     os.system('echo "docker rm"')
@@ -70,18 +70,22 @@ def continuous_integration():
     os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
     time.sleep(20)
     os.system('echo "run the tests"')
-    os.system("./git/Billing/test_batch.sh")
+    test_result = os.system("./git/Billing/test_batch.sh")
     os.system('echo "docker rm"')
 #    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
 #    os.system("rm -r git")
 #    os.system("mkdir git")
-#     if test_result == True:
-#         os.system(f"git checkout {br}")
-#         os.system(f"git merge {after}")
-#         os.system(f"git push origin {branch}")
-#         send_email(f"Commit on branch {branch} - tests passed.", f"Bravo {committer_mail}! Tests results:", committer_mail)
-#     else:
-#         send_email(f"Commit on branch {branch} - tests not passed.", f"Sorry {committer_mail}, Tests results:", committer_mail)
+    subject_pass = f"Commit on branch {branch_name} - tests passed."
+    subject_fail = f"Commit on branch {branch_name} - tests failed."
+    message_pass = f"Congrats! Your commit {after} passed all the tests."
+    message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
+    if test_result == 100:
+        # os.system(f"git checkout {br}")
+        # os.system(f"git merge {after}")
+        # os.system(f"git push origin {branch}")
+        send_email(subject_pass, message_pass, committer_mail)
+    else:
+        send_email(subject_fail, message_fail, committer_mail)
     lock.release()
 
     return jsonify(success=True)
