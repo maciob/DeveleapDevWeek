@@ -6,7 +6,7 @@ services:
     ports:
      - "${PORT_SERVER}:5000"
     volumes:
-     - /app/git/Billing/app/in/rates.xlsx:/app/in/.
+     - /app/git/Billing/app/in/rates.xlsx:/app/in/rates.xlsx
     networks:
      - mynet
   mysql-flask-app-container:
