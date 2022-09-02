@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  app:
+    container_name: flaskapp
+    image: weight_server
+    build: ./app-weight
+    ports:
+      - "${PORT_SERVER}:5000"
+    networks:
+      - mynet
+
+  mydb:
+    container_name: mysqlcont
+    image: mysql:8.0.30
+    ports:
+      - "${PORT_DB}:3306"
+    depends_on:
+      - app
+    networks:
+      - mynet
+    command: --init-file /data/application/init.sql
+    volumes:
+        - /app/git/Weight/database/weight.sql:/data/application/init.sql
+        - flask_app_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: weight
+  volumes:
+    flask_app_volume:
+      name: flask_app_volume

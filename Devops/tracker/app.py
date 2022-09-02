@@ -13,7 +13,7 @@ lista = []
 lock = threading.Lock()
 mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com',
                 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
-                
+
 testingflag = False
 
 
@@ -67,8 +67,12 @@ def continuous_integration():
     os.system('echo "docker build billing"')
     os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
     os.system('echo "docker compose up"')
+    os.system('docker build . -t weight_server:1.0 -f git/Weight/app-weight/Dockerfile')
     os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
+    os.system('docker-compose -f git/Weight/docker-compose.yaml --env-file ./git/Weight/config/.env.dev up --detach')
+
     time.sleep(20)
+
     os.system('echo "run the tests"')
     os.system("./git/Billing/test_batch.sh")
     os.system('echo "docker rm"')
