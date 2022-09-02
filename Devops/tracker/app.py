@@ -17,25 +17,6 @@ mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus
 testingflag = False
 
 
-def send_email(subject, message, receiver_mail):
-
-    #  sends an email with feedback to committer, team leaders and devops team
-
-    msg = MIMEText(message, 'plain')
-    msg['Subject'] = subject
-    port = 587
-    my_mail = 'blueteamdevops@outlook.com'
-    my_password = 'G00gleit'
-    with smtplib.SMTP('smtp-mail.outlook.com', port) as server:
-        server.starttls()
-        server.login(my_mail, my_password)
-        for mail in mailing_list:
-            server.sendmail(my_mail, mail, f"CC: {msg.as_string()}")
-        if receiver_mail not in mailing_list:
-            server.sendmail(my_mail, receiver_mail, msg.as_string())
-        server.quit()
-
-
 @app.route("/monitor", methods=["POST"])
 def health():
     r = request.data.decode('utf-8')
@@ -81,12 +62,35 @@ def continuous_integration():
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
         # os.system(f"git push origin {branch}")
+        os.system('echo "success"')
         send_email(subject_pass, message_pass, committer_mail)
     else:
+        os.system('echo "fail"')
         send_email(subject_fail, message_fail, committer_mail)
     lock.release()
 
     return jsonify(success=True)
+
+
+def send_email(subject, message, receiver_mail):
+
+    #  sends an email with feedback to committer, team leaders and devops team
+    os.system('echo "tu tez bylem"')
+    msg = MIMEText(message, 'plain')
+    msg['Subject'] = subject
+    port = 587
+    my_mail = 'blueteamdevops@outlook.com'
+    my_password = 'G00gleit'
+    with smtplib.SMTP('smtp-mail.outlook.com', port) as server:
+        server.starttls()
+        server.login(my_mail, my_password)
+        for mail in mailing_list:
+            server.sendmail(my_mail, mail, f"CC: {msg.as_string()}")
+        if receiver_mail not in mailing_list:
+            server.sendmail(my_mail, receiver_mail, msg.as_string())
+        server.quit()
+
+
 
 
 @app.route("/home")
