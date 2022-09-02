@@ -213,7 +213,7 @@ def rates():
         conn.commit()
         cur.close()
         conn.close()
-
+        # 
         conn = mysql.connect()
         cur = conn.cursor()
         for i in range(len(data.index)):
