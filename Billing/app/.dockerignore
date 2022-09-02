@@ -1,4 +1,4 @@
 *.md
 */*/Dockerfile*
 */*/requirements*
-in/
+#/app/git/Billing/app/in/
