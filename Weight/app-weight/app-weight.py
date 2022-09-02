@@ -103,24 +103,6 @@ def weight():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def weight1(t1,t2,arg1):
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -214,7 +196,7 @@ def item(id):
     item_truck = getitem(id, arg1, arg2)
     return json.dumps(item_truck)
 
-@app.route("/weight",methods=["GET", "POST"])
+@app.route("/weight1",methods=["GET", "POST"])
 def weight():
     arg1 = request.args.get('filter', default = "in", type = str)
     t1 = request.args.get('t1', default = datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
