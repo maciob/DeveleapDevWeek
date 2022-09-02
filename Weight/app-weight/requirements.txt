@@ -1,0 +1,4 @@
+flask
+datetime
+flask-mysql
+cryptography
