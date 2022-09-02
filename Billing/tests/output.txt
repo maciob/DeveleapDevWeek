@@ -1,0 +1,11 @@
+Passed.
+Passed.
+Failed.
+Passed.
+Passed when user does not exist.
+Failed.
+HTTP/1.1 200 OK
+Passed when we want to add new truck.
+HTTP/1.1 200 OK
+Passed when we want to get trucks data
+Failed.

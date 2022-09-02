@@ -7,10 +7,10 @@ red='\e[1;31m'
 white='\e[0m'
 
 # command ./init.sh "test"
-
-sleep 5
+command sudo rm -f output.txt
 
 pushd ./tests > /dev/null
+    command sudo rm -f output.txt
     command ./get_health.sh >> output.txt
     command ./get_monitor.sh >> output.txt
     command ./get_rates.sh >> output.txt
@@ -28,5 +28,5 @@ pushd ./tests > /dev/null
     elif [ $passed_count -eq 9 ]; then
         echo -e "\n${bold}${green}$passed_count/9 tests passed! Great job!${white}${normal}\n"
     fi
-    rm -f output.txt
+    
 popd > /dev/null
