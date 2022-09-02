@@ -13,6 +13,7 @@ lista = []
 lock = threading.Lock()
 mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com',
                 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
+                
 testingflag = False
 
 
