@@ -2,9 +2,10 @@ version: "3.7"
 services:
   app:
     container_name: flaskapp
+    image: weight_server
     build: ./app-weight
     ports:
-      - "6001:5000"
+      - "${PORT_SERVER}:5000"
     networks:
       - "new_network"
       
@@ -13,7 +14,7 @@ services:
     container_name: mysqlcont
     image: mysql:latest
     ports:
-      - "6000:3306"
+      - "${PORT_DB}:3306"
     depends_on:
       - app
     networks:

@@ -11,4 +11,4 @@ else
     ./dcup.sh $1
 fi
 
-echo -e "\n${bold}Billing app initialization completed.${normal}\n"
+echo -e "\n${bold}Weight app initialization completed.${normal}\n"

@@ -8,4 +8,4 @@ if [[ $1 == "test" ]]; then
 elif [[ $1 == "prod" ]]; then
     command docker-compose --env-file ./config/.env.prod up --detach
 fi
-echo -e "\n${bold}Billing server and database server have been run.${normal}\n"
+echo -e "\n${bold}Weight server and database server have been run.${normal}\n"

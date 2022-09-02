@@ -213,7 +213,7 @@ def sessionid(id):
     tuple1 = id
     cur.execute(query, tuple1)
     sessions = cur.fetchall()
-    return render_template("session.html", content = sessions)
+    return jsonify(sessions)
     
 @app.route("/health",methods=["GET"])
 def testdb():
