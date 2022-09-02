@@ -39,7 +39,7 @@ def continuous_integration():
     lista.append(after)
     lista.append(branch)
     os.system("docker rm -f mysql-flask-app-container python-flask-app-container") 
-    branch_name = re.search(r'/[a-zA-Z]+g', branch).group(0)
+    branch_name = re.search(r'/[a-zA-Z]+g', branch)
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
     os.system('echo "docker rm"')
