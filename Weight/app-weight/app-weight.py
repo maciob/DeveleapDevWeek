@@ -6,12 +6,33 @@ from flaskext.mysql import MySQL
 from datetime import datetime
 import csv
 import json
-import mysql.connector
+import socket
+# import mysql.connector
+
 
 app = Flask(__name__)
 
-def getMysqlConnection():
-    return mysql.connector.connect(user='root', host='mysqlcont', port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
+
+
+def get_ip():
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    temp_list = IPAddr.split(".")
+    last_digit = int(temp_list[3]) + 1
+    temp_list[3] = str(last_digit)
+    new_IP = ".".join(temp_list)
+    return (IPAddr, new_IP)
+
+app = Flask(__name__)
+mysql = MySQL()
+app.config["MYSQL_DATABASE_USER"] = "root"
+app.config["MYSQL_DATABASE_PASSWORD"] = "password"
+app.config["MYSQL_DATABASE_DB"] = "weight"
+app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
+mysql.init_app(app)
+
+# def getMysqlConnection():
+#     return mysql.connector.connect(user='root', host='mysqlcont', port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
 
 
 def weight1(t1,t2,arg1):
@@ -66,9 +87,9 @@ def getitem(id, arg1, arg2):
 
 @app.route("/",methods=["GET"])
 def home():
-    db = getMysqlConnection()
+    db = mysql.connect()
     cur = db.cursor()
-    data = cur.execute("SELECT * FROM containers_registered")
+    data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
     return render_template('index.html', content=data)
     
@@ -87,9 +108,9 @@ def unknown():
     
     if request.method == "GET":
         users = []
-        conn =  getMysqlConnection()
+        conn =  mysql.connect()
         cursor = conn.cursor()
-        query = 'SELECT UserId from <table_name>'
+        query = 'SELECT UserId from <table_name>;'
         cursor.execute(query)
 
         for  row in cursor:
@@ -109,18 +130,18 @@ def item(id):
 
 @app.route("/weight",methods=["GET", "POST"])
 def weight():
-arg1 = request.args.get('filter', default = "in", type = str)
-        t1 = request.args.get('t1', default = datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
-        t2 = request.args.get('t2', default = datetime.now(), type = int)
-        weight11 = weight1(t1,t2,arg1)
-        return json.dumps(weight11)
+    arg1 = request.args.get('filter', default = "in", type = str)
+    t1 = request.args.get('t1', default = datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
+    t2 = request.args.get('t2', default = datetime.now(), type = int)
+    weight11 = weight1(t1,t2,arg1)
+    return json.dumps(weight11)
     
     
 @app.route("/session/<id>",methods=["GET"])
 def sessionid(id):
-    s1 = getMysqlConnection()
+    s1 = mysql.connect()
     cur = s1.cursor()
-    query = """select * from containers_registered where container_id = %s"""
+    query = """select * from containers_registered where container_id = %s;"""
     tuple1 = id
     cur.execute(query, tuple1)
     sessions = cur.fetchall()
@@ -130,19 +151,19 @@ def sessionid(id):
 def testdb():
     
     try:
-        conn = getMysqlConnection()
+        conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute("select * from containers_registered")
-        results = cur.fetchall()
+        cur.execute("select 1;")
+        results = cur.fetchone()
         if results:
             thisdict = {"Connection": "OK"}
-            return thisdict
+            return jsonify(thisdict)
     except:
         thisdict = {"Connection": "No"}
-        return thisdict
+        return jsonify(thisdict)
     
 def handling_files(file):
-    conn = getMysqlConnection()
+    conn = mysql.connect()
     cur = conn.cursor()
     input = file
     index = input.index(".")
@@ -192,5 +213,5 @@ def monitor():
 
 
 if __name__ == "__main__":
-	app.run(debug=True, host='0.0.0.0', port=5000)
+	app.run(host='0.0.0.0')
  

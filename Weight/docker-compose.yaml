@@ -1,12 +1,8 @@
-version: "3"
+version: "3.7"
 services:
   app:
     container_name: flaskapp
     build: ./app-weight
-    links:
-      - mydb
-    depends_on:
-      - "mydb"
     ports:
       - "6001:5000"
     networks:
@@ -18,6 +14,8 @@ services:
     image: mysql:latest
     ports:
       - "6000:3306"
+    depends_on:
+      - app
     networks:
       - "new_network"
     command: --init-file /data/application/init.sql
