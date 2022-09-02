@@ -7,7 +7,7 @@ red='\e[1;31m'
 white='\e[0m'
 
 
-pushd app/git/Billing/tests > /dev/null
+pushd /app/git/Billing/tests > /dev/null
     command rm -f output.txt
     command ./get_health.sh >> output.txt
     command ./get_monitor.sh >> output.txt
