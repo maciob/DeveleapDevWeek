@@ -14,7 +14,7 @@ commit_list=[]
 def list():
 
     r = request.json
-    
+#shadow    
     if type(r) == list:
         for res in r:
             commit_list.append({'before': res['before'], 'after': res['after'], 'head': res['ref']})
