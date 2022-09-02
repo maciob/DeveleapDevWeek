@@ -159,9 +159,9 @@ def home():
     cur = db.cursor()
     data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
-    return render_template('index.html', content=data)
+    return f"<h1>Home page of weight team app</h1>"
     
- 
+
 @app.route("/batch-weight",methods=["GET","POST"])
 def batch_weight(): 
     if request.method == "POST":
