@@ -45,7 +45,7 @@ def list():
     os.system('echo "run the tests"')
     os.system("./git/Billing/test_batch.sh")
     os.system('echo "docker rm"')
-    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
+#    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
 #    os.system("rm -r git")
 #    os.system("mkdir git")
     lock.release()
