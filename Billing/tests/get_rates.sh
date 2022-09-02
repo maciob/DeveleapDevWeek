@@ -5,8 +5,10 @@
 # popd > /dev/null
 
 # sleep 2
-
-curl -i localhost:8086/rates | tac | tac | grep -a "200" &>/dev/null
+echo " "
+echo $0
+echo " "
+curl -i 18.170.241.119:8086/rates | tac | tac | grep -a "200" 
 if [ $? == 0 ]; then
     echo "Passed."
 else

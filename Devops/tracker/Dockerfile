@@ -13,5 +13,6 @@ RUN pip3 install -r requirements.txt
 RUN mkdir -p ~/.docker/cli-plugins/
 RUN curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
 RUN chmod +x ~/.docker/cli-plugins/docker-compose
+RUN apt-get -y install docker-compose
 ENTRYPOINT ["python3", "-m" , "flask", "--app", "app.py", "run", "--host=0.0.0.0"]
 
