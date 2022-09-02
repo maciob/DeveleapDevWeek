@@ -25,4 +25,13 @@ pushd /app/git/Billing/tests > /dev/null
 
     else echo -e "\n${bold}${red}Oh...$passed_count/9 tests passed.${white}${normal}\n"
     fi
+
+    if [ $passed_count -eq 9 ]; then
+        exit 100
+    else
+        exit $passed_count
+    fi
+
+
+
 popd > /dev/null
