@@ -75,8 +75,7 @@ def continuous_integration():
 #    os.system("rm -r git")
 #    os.system("mkdir git")
     if test_result == True:
-        os.system(f"git checkout branch {branch}")
-        os.system(f"git merge {after}")
+        os.system(f"git merge {br} {after}")
         os.system(f"git push origin {branch}")
         send_email(f"Commit on branch {branch} - tests passed.", f"Bravo {committer_mail}! Tests results:", committer_mail)
     else:
