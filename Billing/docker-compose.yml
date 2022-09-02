@@ -6,7 +6,7 @@ services:
     ports:
      - "${PORT_SERVER}:5000"
     volumes:
-     - /git/Billing/app/in:/app/in
+     - /app/git/Billing/app/in:/app/in
     networks:
      - mynet
   mysql-flask-app-container:
@@ -15,7 +15,7 @@ services:
     ports:
      - "${PORT_DB}:3306"
     volumes:
-     - /git/Billing/db_volume:/var/lib/mysql
+     - /app/git/Billing/db_volume:/var/lib/mysql
     networks:
      - mynet
     depends_on:
