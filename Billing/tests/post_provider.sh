@@ -6,7 +6,7 @@
 
 # sleep 2
 
-curl -d "username=pro1" -X POST localhost:8086/provider | tac | tac | grep -a "already" &>/dev/null
+curl -d "username=pro1" -X POST 18.170.241.119:8086/provider | tac | tac | grep -a "already" &>/dev/null
 if [ $? == 0 ]; then
     echo "Passed."
 else
