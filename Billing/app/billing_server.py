@@ -136,9 +136,10 @@ def update_provider(id):
         conn.close()
         return render_template("update_provider.html", providers=data, title="Update provider")
     
-    # elif request.method == "POST":
-    #     inf = requests.put('https://httpbin.org / put', data ={'username':f'{id}'})
-    #     return inf
+    elif request.method == "POST":
+        name = request.form["username"]
+        inf = requests.put(f"{request.environ['HTTP_HOST']}/provider/{id}", data ={'username':f'{name}'})
+        return inf
 
 
 @app.route("/ip", methods=["GET"])
