@@ -138,7 +138,7 @@ def update_provider(id):
     
     elif request.method == "POST":
         name = request.form["username"]
-        response = requests.put(f"{request.environ['HTTP_HOST']}/provider/{id}", data = {'username':f'{name}'})
+        response = requests.put(f"http://{request.environ['HTTP_HOST']}/provider/{id}", data = {'username':f'{name}'})
         # return inf
         return response.content
 
