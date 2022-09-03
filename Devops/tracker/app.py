@@ -25,7 +25,6 @@ def health():
 
 @app.route("/api", methods=["POST"])
 def continuous_integration():
-    global testingflag
     r = request.json
     before = r["before"]
     after = r["after"]
@@ -48,9 +47,15 @@ def continuous_integration():
     os.system("docker build . -t mysql_db:1.0  -f git/Billing/db/Dockerfile")
     os.system('echo "docker build billing"')
     os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
+    os.system('echo "docker build weight"')
+    os.system("docker build . -t weight_server:1.0 -f git/Weight/app-weight/Dockerfile")
     os.system('echo "docker compose up"')
     os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
+    os.system('echo "docker compose up"')
+    os.system("docker-compose -f git/Weight/docker-compose.yaml --env-file ./git/Weight/config/.env.dev up --detach")
+
     time.sleep(20)
+
     os.system('echo "run the tests"')
     test_result = os.system("./git/Billing/test_batch.sh")
     os.system('echo "docker rm"')
@@ -60,7 +65,7 @@ def continuous_integration():
     message_pass = f"Congrats! Your commit {after} passed all the tests."
     message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
 
-    if test_result == 100:
+    if test_result == "100":
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
         # os.system(f"git push origin {branch}")
