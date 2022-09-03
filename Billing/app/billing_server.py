@@ -121,7 +121,9 @@ def update_provider(id):
 
 @app.route("/ip", methods=["GET"])
 def ip():
-    return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+    resp=f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+    # return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+    return render_template("ip.html", ip=resp, title="IP")
 
 
 @app.route("/ipdb", methods=["GET"])
