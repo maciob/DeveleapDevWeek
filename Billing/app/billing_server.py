@@ -140,7 +140,7 @@ def update_provider(id):
         name = request.form["username"]
         response = requests.put(f"http://{request.environ['HTTP_HOST']}/provider/{id}", data = {'username':f'{name}'})
         # return inf
-        return jsonify(response.content)
+        return response.content
 
 
 @app.route("/ip", methods=["GET"])
