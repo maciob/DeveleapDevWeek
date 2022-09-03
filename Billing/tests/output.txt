@@ -11,7 +11,9 @@ Passed.
  
 ./get_rates.sh
  
-Failed.
+HTTP/1.1 200 OK
+ETag: "1662120634.6993635-5192-1020200642"
+Passed.
  
 ./post_provider.sh
  
@@ -34,4 +36,5 @@ Passed when we want to get trucks data
  
 ./post_rates.sh
  
-Failed.
+Inserted into DB successfully
+Passed.
