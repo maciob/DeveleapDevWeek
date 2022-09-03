@@ -69,8 +69,9 @@ def continuous_integration():
     subject_fail = f"Commit on branch {branch_name} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
     message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
-    os.system('echo "{test_result}"')
-    os.system('echo "{branch_name}"')
+    os.system(f'echo "{committer_mail}"')
+    os.system(f'echo "{test_result}"')
+    os.system(f'echo "{branch_name}"')
     if test_result == "100":
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
@@ -98,6 +99,7 @@ def send_email(subject, message, receiver_mail):
         server.starttls()
         server.login(my_mail, my_password)
         for mail in mailing_list:
+            os.system(f'echo "{mail}"')
             server.sendmail(my_mail, mail, f"CC: {msg.as_string()}")
         if receiver_mail not in mailing_list:
             server.sendmail(my_mail, receiver_mail, msg.as_string())
