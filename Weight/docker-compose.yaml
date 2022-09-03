@@ -3,7 +3,7 @@ services:
   app:
     container_name: flaskapp
     image: weight_server
-    build: /app/git/Weight/app-weight/app-weight.py
+    build: /app/git/Weight/app-weight
     ports:
       - "${PORT_SERVER}:5000"
     networks:
@@ -26,6 +26,6 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: weight
 
-  volumes:
-    flask_app_volume:
-      name: flask_app_volume
+volumes:
+  flask_app_volume:
+    name: flask_app_volume
