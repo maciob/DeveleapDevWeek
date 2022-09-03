@@ -159,9 +159,9 @@ def home():
     cur = db.cursor()
     data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
-    return render_template('index.html', content=data)
+    return f"<h1>Home page of weight team app</h1>"
     
- 
+
 @app.route("/batch-weight",methods=["GET","POST"])
 def batch_weight(): 
     if request.method == "POST":
@@ -197,7 +197,7 @@ def item(id):
     return json.dumps(item_truck)
 
 @app.route("/weight1",methods=["GET", "POST"])
-def weight():
+def weight1():
     arg1 = request.args.get('filter', default = "in", type = str)
     t1 = request.args.get('t1', default = datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
     t2 = request.args.get('t2', default = datetime.now(), type = int)
