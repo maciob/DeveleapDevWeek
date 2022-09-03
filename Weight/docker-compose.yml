@@ -2,7 +2,7 @@ version: "3.7"
 services:
   app:
     container_name: "${NAME_APP}"
-    image: weight_server:1.0
+    image: "${VERSION}"
     build: /app/git/Weight/app-weight
     ports:
       - "${PORT_SERVER}:5000"
