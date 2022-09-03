@@ -134,7 +134,7 @@ def update_provider(id):
         data = cur.fetchall()
         cur.close()
         conn.close()
-        return render_template("update_provider.html", providers=data, title="Update provider")
+        return render_template("update_provider.html", providers=data, title="Update provider name")
     
     elif request.method == "POST":
         name = request.form["username"]
