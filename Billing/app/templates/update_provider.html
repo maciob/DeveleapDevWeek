@@ -2,13 +2,13 @@
 
 {% block content %}
     <h1>{% block title %} {{ title }} {% endblock %}</h1>
+    <p>Insert id of priovider that u want to update in the web adress. For example: /provider/10001 </p>
     <p> All providers: {{providers}} </p>
     
     
     <form method="post" target="response_frame">
         <div class="input-group mb-3">
             <span class="input-group-text">Provider NAME</span>
-            {% comment %} <input type="hidden" name="_method" value="PUT"> {% endcomment %}
         <input type="text" class="form-control"  placeholder="Type new company name here" name="username">
         <button class="btn btn-outline-secondary" type="submit">Submit</button>
         </div>
