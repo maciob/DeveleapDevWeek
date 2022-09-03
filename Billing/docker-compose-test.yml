@@ -1,0 +1,26 @@
+version: '3.7' 
+services: 
+  billingapp:
+    image: "${VERSIONAPP}"
+    container_name: "${NAME_APP}"
+    ports:
+     - "${PORT_SERVER}:5000"
+    volumes:
+     - /app/git/Billing/app/in:/app/in
+    networks:
+     - mynet
+  mysqlbilling:
+    image: "${VERSIONMYSQL}"
+    container_name: "${NAME_DB}"
+    ports:
+     - "${PORT_DB}:3306"
+    volumes:
+     - /app/git/Billing/db_volume_test:/var/lib/mysql
+    networks:
+     - mynet
+    depends_on:
+     - billingapp
+
+networks:
+  mynet:
+    name: mynet
