@@ -139,7 +139,8 @@ def update_provider(id):
     elif request.method == "POST":
         name = request.form["username"]
         inf = requests.put(f"{request.environ['HTTP_HOST']}/provider/{id}", data ={'username':f'{name}'})
-        return inf
+        # return inf
+        return f"{request.environ['HTTP_HOST']}/provider/{id}"
 
 
 @app.route("/ip", methods=["GET"])
