@@ -77,7 +77,7 @@ def continuous_integration():
         os.system("docker build . -t mysql_db:1.1  -f git/Billing/db/Dockerfile")
         os.system("docker build . -t billing_server:1.1  -f git/Billing/app/Dockerfile")
         os.system("docker build . -t weight_server:1.1  -f git/Weight/app-weight/Dockerfile")
-        os.system("docker rm -f MYSQL-Billing-app Billing-app Weight-app MYSQL-Weight-app")
+        os.system("docker rm -f MYSQL-Billing-app-prod Billing-app-prod Weight-app-prod MYSQL-Weight-app-prod")
         os.system('echo "docker compose up"')
         os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.prod up --detach")
         os.system('echo "docker compose up"')

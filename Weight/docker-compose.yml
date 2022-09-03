@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  app:
+  "${NAMEAPP}":
     container_name: "${NAME_APP}"
     image: "${VERSION}"
     build: /app/git/Weight/app-weight
@@ -9,7 +9,7 @@ services:
     networks:
       - mynet
 
-  mydb:
+  "${NAMESQL}":
     container_name: "${NAME_DB}"
     image: mysql:latest
     ports:
