@@ -45,7 +45,7 @@ def continuous_integration():
     lista.append(before)
     lista.append(after)
     lista.append(branch)
-    #branch_name = re.search(r'/[a-zA-Z]+g', branch)
+    branch_name = re.search(r'/[a-zA-Z]+g', branch)
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
     os.system('echo "docker build db"')
@@ -54,9 +54,9 @@ def continuous_integration():
     os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
     os.system('echo "docker build weight"')
     os.system("docker build . -t weight_server:1.0 -f git/Weight/app-weight/Dockerfile")
-    os.system('echo "docker compose up"')
+    os.system('echo "docker compose up --remove-orphans"')
     os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
-    os.system('echo "docker compose up"')
+    os.system('echo "docker compose up --remove-orphans"')
     os.system("docker-compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.dev up --detach")
 
     time.sleep(20)
@@ -69,8 +69,8 @@ def continuous_integration():
     lock.release()
     os.system('echo "docker rm"')
 
-    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
-
+    #os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
+    #asd
     subject_pass = f"Commit on branch {branch} - tests passed."
     subject_fail = f"Commit on branch {branch} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
