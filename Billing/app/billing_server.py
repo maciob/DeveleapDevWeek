@@ -40,6 +40,12 @@ def run():
 def home():
     return render_template("index.html")
 
+@app.route('/env')
+def env():
+    resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
+    odp = "</br>".join(resp)
+    return render_template("env.html", env=odp, title="ENV")
+
 
 @app.route("/monitor", methods=["GET", "POST"])
 def monitor():
@@ -100,7 +106,7 @@ def add_provider():
             return jsonify(id=data)
 
 
-@app.route("/provider/<id>", methods=["PUT","GET"])
+@app.route("/provider/<id>", methods=["PUT","GET","POST"])
 def update_provider(id):
     if request.method == "PUT":
         name = request.form["username"]
@@ -129,6 +135,10 @@ def update_provider(id):
         cur.close()
         conn.close()
         return render_template("update_provider.html", providers=data, title="Update provider")
+    
+    # elif request.method == "POST":
+    #     inf = requests.put('https://httpbin.org / put', data ={'username':f'{id}'})
+    #     return inf
 
 
 @app.route("/ip", methods=["GET"])
