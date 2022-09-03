@@ -29,4 +29,10 @@ pushd ./tests > /dev/null
         echo -e "\n${bold}${green}$passed_count/9 tests passed! Great job!${white}${normal}\n"
     fi
     
+    if [ $passed_count -eq 9 ]; then
+        exit 100
+    else
+        exit $passed_count
+    fi
+    
 popd > /dev/null
