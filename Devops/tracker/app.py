@@ -36,9 +36,9 @@ def continuous_integration():
         committer_mail = commit['author']['email']
     lock.acquire()
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
-    os.system("rm -r git")
-    os.system("mkdir git")
-    os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
+    #os.system("rm -r git")
+    #os.system("mkdir git")
+    os.system("git -C git pull")
     lista.append(before)
     lista.append(after)
     lista.append(branch)
