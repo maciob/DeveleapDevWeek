@@ -24,6 +24,7 @@ def health():
     return jsonify(success=True)
 
 
+#asd
 @app.route("/api", methods=["POST"])
 def continuous_integration():
     r = request.json
@@ -50,9 +51,9 @@ def continuous_integration():
     os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
     os.system('echo "docker build weight"')
     os.system("docker build . -t weight_server:1.0 -f git/Weight/app-weight/Dockerfile")
-    os.system('echo "docker compose up"')
+    os.system('echo "docker compose up --no-recreate"')
     os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
-    os.system('echo "docker compose up"')
+    os.system('echo "docker compose up --no-recreate"')
     os.system("docker-compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.dev up --detach")
 
     time.sleep(20)
@@ -78,9 +79,9 @@ def continuous_integration():
         os.system("docker build . -t billing_server:1.1  -f git/Billing/app/Dockerfile")
         os.system("docker build . -t weight_server:1.1  -f git/Weight/app-weight/Dockerfile")
         os.system("docker rm -f MYSQL-Billing-app Billing-app Weight-app MYSQL-Weight-app")
-        os.system('echo "docker compose up"')
+        os.system('echo "docker compose up --no-recreate"')
         os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.prod up --detach")
-        os.system('echo "docker compose up"')
+        os.system('echo "docker compose up --no-recreate"')
         os.system("docker-compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.prod up --detach")
     elif return_code == 100 and "master" not in branch:
         os.system('echo "success"')
