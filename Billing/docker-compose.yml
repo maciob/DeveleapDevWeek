@@ -1,6 +1,6 @@
 version: '3.7' 
 services: 
-  python-flask-app-container:
+  "${NAMEAPP}":
     image: "${VERSIONAPP}"
     container_name: "${NAME_APP}"
     ports:
@@ -9,7 +9,7 @@ services:
      - /app/git/Billing/app/in:/app/in
     networks:
      - mynet
-  mysql-flask-app-container:
+  "${NAMESQL}":
     image: "${VERSIONMYSQL}"
     container_name: "${NAME_DB}"
     ports:
@@ -19,7 +19,7 @@ services:
     networks:
      - mynet
     depends_on:
-     - python-flask-app-container
+     - "${NAMEAPP}"
 
 networks:
   mynet:
