@@ -20,7 +20,7 @@ services:
       - mynet
     command: --init-file /data/application/init.sql
     volumes:
-        - /app/git/Weight/database/weight.sql:/data/application/init.sql
+        - /app/git/Weight/database/weight_test.sql:/data/application/init.sql
         - flask_app_volume_test:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
