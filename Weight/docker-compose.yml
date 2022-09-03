@@ -27,8 +27,8 @@ services:
       MYSQL_DATABASE: weight
       
 volumes:
-  flask_app_volume:
-    name: flask_app_volume
+  flask_app_volume_test:
+    name: flask_app_volume_test
 
 networks:
   mynet:
