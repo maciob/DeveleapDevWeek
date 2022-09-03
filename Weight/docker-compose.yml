@@ -15,7 +15,7 @@ services:
     ports:
       - "${PORT_DB}:3306"
     depends_on:
-      - app
+      - WeightApp
     networks:
       - mynet
     command: --init-file /data/application/init.sql

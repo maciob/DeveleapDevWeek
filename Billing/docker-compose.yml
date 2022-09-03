@@ -19,7 +19,7 @@ services:
     networks:
      - mynet
     depends_on:
-     - "${NAMEAPP}"
+     - billingapp
 
 networks:
   mynet:
