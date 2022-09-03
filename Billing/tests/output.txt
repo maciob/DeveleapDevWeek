@@ -1,30 +1,40 @@
  
 ./get_health.sh
  
-Failed.
+{"Database":"OK"}
+Passed.
  
 ./get_monitor.sh
  
-Failed.
+<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor </br>
+Passed.
  
 ./get_rates.sh
  
-Failed.
+HTTP/1.1 200 OK
+ETag: "1662120634.6993635-5192-1020200642"
+Passed.
  
 ./post_provider.sh
  
-Failed.
+Name already in database. Try again.
+Passed.
  
 ./put_provider_id.sh
  
-Failed.
-Failed.
+No provider with this ID in database.
+Passed when user does not exist.
+[10001,"test_when user_exists"]
+Passed when user exists.
  
 ./post_get_truck.sh
  
-Failed.
-Failed.
+HTTP/1.1 200 OK
+Passed when we want to add new truck.
+HTTP/1.1 200 OK
+Passed when we want to get trucks data
  
 ./post_rates.sh
  
-Failed.
+Inserted into DB successfully
+Passed.
