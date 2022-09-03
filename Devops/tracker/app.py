@@ -70,7 +70,7 @@ def continuous_integration():
     os.system('echo "docker rm"')
 
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
-
+    #asd
     subject_pass = f"Commit on branch {branch} - tests passed."
     subject_fail = f"Commit on branch {branch} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
