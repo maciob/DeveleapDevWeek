@@ -2,7 +2,7 @@ version: '3.7'
 services: 
   python-flask-app-container:
     image: billing_server:1.0
-    container_name: python-flask-app-container
+    container_name: "${NAME_APP}"
     ports:
      - "${PORT_SERVER}:5000"
     volumes:
@@ -11,7 +11,7 @@ services:
      - mynet
   mysql-flask-app-container:
     image: mysql_db:1.0
-    container_name: mysql-flask-app-container
+    container_name: "${NAME_DB}"
     ports:
      - "${PORT_DB}:3306"
     volumes:

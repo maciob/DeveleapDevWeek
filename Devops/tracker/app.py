@@ -6,6 +6,7 @@ import os
 import threading
 import time
 import re
+import subprocess
 
 app = Flask(__name__)
 
@@ -34,18 +35,16 @@ def continuous_integration():
         committer_mail = commit['author']['email']
 
     lock.acquire()
-    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-container-testing Weight-app-testing MYSQL-Weight-app-testing")
+    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
     os.system("rm -r git")
     os.system("mkdir git")
     os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
     lista.append(before)
     lista.append(after)
     lista.append(branch)
-    branch_name = re.search(r'/[a-zA-Z]+g', branch)
+    #branch_name = re.search(r'/[a-zA-Z]+g', branch)
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
-    os.system('echo "docker rm"')
-    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
     os.system('echo "docker build db"')
     os.system("docker build . -t mysql_db:1.0  -f git/Billing/db/Dockerfile")
     os.system('echo "docker build billing"')
@@ -61,26 +60,32 @@ def continuous_integration():
 
     os.system('echo "run the tests"')
 
-    test_result = os.system("./git/Billing/test_batch.sh")
+    result = subprocess.Popen("./git/Billing/test_batch.sh")
+    text = result.communicate()[0]
+    return_code = result.returncode
 
     os.system('echo "docker rm"')
 
-    subject_pass = f"Commit on branch {branch_name} - tests passed."
-    subject_fail = f"Commit on branch {branch_name} - tests failed."
+    subject_pass = f"Commit on branch {branch} - tests passed."
+    subject_fail = f"Commit on branch {branch} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
-    message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
-    os.system(f'echo "{committer_mail}"')
-    os.system(f'echo "{test_result}"')
-    os.system(f'echo "{branch_name}"')
-    if test_result == "100":
+    message_fail = f"Sorry! Your commit {after} passed only {return_code} tests."
+    if test_result == "100" and "master" in branch:
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
         # os.system(f"git push origin {branch}")
+        os.system('echo "stawiamy nowa wersja z mastera"')
+        os.system("docker rm -f MYSQL-Billing-app Billing-app Weight-app MYSQL-Weight-app")
+        os.system('echo "docker compose up"')
+        os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.prod up --detach")
+        os.system('echo "docker compose up"')
+        os.system("docker-compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.prod up --detach")
+    elif test_result == "100" and "master" not in branch:
         os.system('echo "success"')
-        send_email(subject_pass, message_pass, committer_mail)
+        #send_email(subject_pass, message_pass, committer_mail)
     else:
         os.system('echo "fail"')
-        send_email(subject_fail, message_fail, committer_mail)
+        #send_email(subject_fail, message_fail, committer_mail)
     lock.release()
 
     return jsonify(success=True)
