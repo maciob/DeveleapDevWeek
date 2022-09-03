@@ -63,8 +63,10 @@ def continuous_integration():
     result = subprocess.Popen("./git/Billing/test_batch.sh")
     text = result.communicate()[0]
     return_code = result.returncode
-
+    lock.release()
     os.system('echo "docker rm"')
+
+    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
 
     subject_pass = f"Commit on branch {branch} - tests passed."
     subject_fail = f"Commit on branch {branch} - tests failed."
@@ -89,7 +91,7 @@ def continuous_integration():
     else:
         os.system('echo "fail"')
         #send_email(subject_fail, message_fail, committer_mail)
-    lock.release()
+    #lock.release()
 
     return jsonify(success=True)
 
