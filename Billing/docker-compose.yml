@@ -15,7 +15,7 @@ services:
     ports:
      - "${PORT_DB}:3306"
     volumes:
-     - /app/git/Billing/db_volume:/var/lib/mysql
+     - /app/git/Billing/db_volume_test:/var/lib/mysql
     networks:
      - mynet
     depends_on:
