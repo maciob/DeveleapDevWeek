@@ -32,12 +32,15 @@ def continuous_integration():
     commits = r['commits']
     for commit in commits:
         committer_mail = commit['author']['email']
+
     lock.acquire()
+    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-container-testing Weight-app-testing MYSQL-Weight-app-testing")
+    os.system("rm -r git")
+    os.system("mkdir git")
     os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
     lista.append(before)
     lista.append(after)
     lista.append(branch)
-    os.system("docker rm -f mysql-flask-app-container python-flask-app-container") 
     branch_name = re.search(r'/[a-zA-Z]+g', branch)
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
@@ -57,14 +60,17 @@ def continuous_integration():
     time.sleep(20)
 
     os.system('echo "run the tests"')
+
     test_result = os.system("./git/Billing/test_batch.sh")
+
     os.system('echo "docker rm"')
 
     subject_pass = f"Commit on branch {branch_name} - tests passed."
     subject_fail = f"Commit on branch {branch_name} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
     message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
-
+    os.system('echo "{test_result}"')
+    os.system('echo "{branch_name}"')
     if test_result == "100":
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
@@ -96,8 +102,6 @@ def send_email(subject, message, receiver_mail):
         if receiver_mail not in mailing_list:
             server.sendmail(my_mail, receiver_mail, msg.as_string())
         server.quit()
-
-
 
 
 @app.route("/home")

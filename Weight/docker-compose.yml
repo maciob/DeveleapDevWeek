@@ -1,8 +1,8 @@
 version: "3.7"
 services:
   app:
-    container_name: flaskapp
-    image: weight_server
+    container_name: "${NAME_APP}"
+    image: weight_server:1.0
     build: /app/git/Weight/app-weight
     ports:
       - "${PORT_SERVER}:5000"
@@ -10,7 +10,7 @@ services:
       - mynet
 
   mydb:
-    container_name: mysqlcont
+    container_name: "${NAME_DB}"
     image: mysql:latest
     ports:
       - "${PORT_DB}:3306"
