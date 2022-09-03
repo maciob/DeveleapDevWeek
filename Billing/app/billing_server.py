@@ -8,7 +8,7 @@ from flask import send_file
 from datetime import datetime
 import requests
 import os
-#shadow
+
 
 def get_ip():
     hostname = socket.gethostname()
