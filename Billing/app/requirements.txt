@@ -1,0 +1,6 @@
+flask
+flask-mysql
+pandas
+openpyxl
+requests
+cryptography
