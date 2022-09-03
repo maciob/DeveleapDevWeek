@@ -72,7 +72,7 @@ def add_provider():
     if request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider")
+        cur.execute(f"SELECT * FROM Provider;")
         data = cur.fetchall()
         cur.close()
         conn.close()
@@ -89,6 +89,8 @@ def add_provider():
         else:
             cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
             conn.commit()
+            cur.close()
+            conn.close()
             conn = mysql.connect()
             cur = conn.cursor()
             cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
@@ -98,25 +100,35 @@ def add_provider():
             return jsonify(id=data)
 
 
-@app.route("/provider/<id>", methods=["PUT"])
+@app.route("/provider/<id>", methods=["PUT","GET"])
 def update_provider(id):
-    name = request.form["username"]
-    conn = mysql.connect()
-    cur = conn.cursor()
-    if not cur.execute(f"SELECT * FROM Provider WHERE id = '{id}';"):
-        cur.close()
-        conn.close()
-        return "No provider with this ID in database.\n"
-    else:
-        cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
-        conn.commit()
+    if request.method == "PUT":
+        name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
-        data = cur.fetchone()
+        if not cur.execute(f"SELECT * FROM Provider WHERE id = '{id}';"):
+            cur.close()
+            conn.close()
+            return "No provider with this ID in database.\n"
+        else:
+            cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
+            conn.commit()
+            conn = mysql.connect()
+            cur = conn.cursor()
+            cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
+            data = cur.fetchone()
+            cur.close()
+            conn.close()
+            return jsonify(data)
+        
+    elif request.method == "GET":
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM Provider;")
+        data = cur.fetchall()
         cur.close()
         conn.close()
-        return jsonify(data)
+        return render_template("update_provider.html", providers=data, title="Update provider")
 
 
 @app.route("/ip", methods=["GET"])
