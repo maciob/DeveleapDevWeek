@@ -1,7 +1,7 @@
 version: '3.7' 
 services: 
   python-flask-app-container:
-    image: billing_server:1.0
+    image: billing_server:"${VERSION}"
     container_name: "${NAME_APP}"
     ports:
      - "${PORT_SERVER}:5000"

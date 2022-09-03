@@ -35,7 +35,7 @@ def continuous_integration():
         committer_mail = commit['author']['email']
 #asd
     lock.acquire()
-    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weigh-app-testing MYSQL-Weight-app-testing")
+    os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
     os.system("rm -r git")
     os.system("mkdir git")
     os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
@@ -75,6 +75,9 @@ def continuous_integration():
         # os.system(f"git merge {after}")
         # os.system(f"git push origin {branch}")
         os.system('echo "stawiamy nowa wersja z mastera"')
+        os.system("docker build . -t mysql_db:1.1  -f git/Billing/db/Dockerfile")
+        os.system("docker build . -t billing_server:1.1  -f git/Billing/app/Dockerfile")
+        os.system("docker build . -t weight_server:1.1  -f git/Weight/app-weight/Dockerfile")
         os.system("docker rm -f MYSQL-Billing-app Billing-app Weight-app MYSQL-Weight-app")
         os.system('echo "docker compose up"')
         os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.prod up --detach")
