@@ -70,7 +70,7 @@ def continuous_integration():
     subject_fail = f"Commit on branch {branch} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
     message_fail = f"Sorry! Your commit {after} passed only {return_code} tests."
-    if test_result == "100" and "master" in branch:
+    if return_code == "100" and "master" in branch:
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
         # os.system(f"git push origin {branch}")
@@ -80,7 +80,7 @@ def continuous_integration():
         os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.prod up --detach")
         os.system('echo "docker compose up"')
         os.system("docker-compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.prod up --detach")
-    elif test_result == "100" and "master" not in branch:
+    elif return_code == "100" and "master" not in branch:
         os.system('echo "success"')
         #send_email(subject_pass, message_pass, committer_mail)
     else:
