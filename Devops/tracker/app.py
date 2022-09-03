@@ -17,10 +17,72 @@ mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus
 testingflag = False
 
 
+@app.route("/monitor", methods=["POST"])
+def health():
+    r = request.data.decode('utf-8')
+    return jsonify(success=True)
+
+
+@app.route("/api", methods=["POST"])
+def continuous_integration():
+    r = request.json
+    before = r["before"]
+    after = r["after"]
+    branch = r["ref"]
+    commits = r['commits']
+    for commit in commits:
+        committer_mail = commit['author']['email']
+    lock.acquire()
+    os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
+    lista.append(before)
+    lista.append(after)
+    lista.append(branch)
+    os.system("docker rm -f mysql-flask-app-container python-flask-app-container") 
+    branch_name = re.search(r'/[a-zA-Z]+g', branch)
+    os.system('echo "git checkout to dir git"')
+    os.system(f"git -C git/ checkout {after}")
+    os.system('echo "docker rm"')
+    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
+    os.system('echo "docker build db"')
+    os.system("docker build . -t mysql_db:1.0  -f git/Billing/db/Dockerfile")
+    os.system('echo "docker build billing"')
+    os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
+    os.system('echo "docker build weight"')
+    os.system("docker build . -t weight_server:1.0 -f git/Weight/app-weight/Dockerfile")
+    os.system('echo "docker compose up"')
+    os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
+    os.system('echo "docker compose up"')
+    os.system("docker-compose -f git/Weight/docker-compose.yaml --env-file ./git/Weight/config/.env.dev up --detach")
+
+    time.sleep(20)
+
+    os.system('echo "run the tests"')
+    test_result = os.system("./git/Billing/test_batch.sh")
+    os.system('echo "docker rm"')
+
+    subject_pass = f"Commit on branch {branch_name} - tests passed."
+    subject_fail = f"Commit on branch {branch_name} - tests failed."
+    message_pass = f"Congrats! Your commit {after} passed all the tests."
+    message_fail = f"Sorry! Your commit {after} passed only {test_result} tests."
+
+    if test_result == "100":
+        # os.system(f"git checkout {br}")
+        # os.system(f"git merge {after}")
+        # os.system(f"git push origin {branch}")
+        os.system('echo "success"')
+        send_email(subject_pass, message_pass, committer_mail)
+    else:
+        os.system('echo "fail"')
+        send_email(subject_fail, message_fail, committer_mail)
+    lock.release()
+
+    return jsonify(success=True)
+
+
 def send_email(subject, message, receiver_mail):
-
+    global mailing_list
     #  sends an email with feedback to committer, team leaders and devops team
-
+    os.system('echo "tu tez bylem"')
     msg = MIMEText(message, 'plain')
     msg['Subject'] = subject
     port = 587
@@ -36,59 +98,6 @@ def send_email(subject, message, receiver_mail):
         server.quit()
 
 
-@app.route("/monitor", methods=["POST"])
-def health():
-    r = request.data.decode('utf-8')
-    return jsonify(success=True)
-
-
-@app.route("/api", methods=["POST"])
-def continuous_integration():
-    global testingflag
-    r = request.json
-    before = r["before"]
-    after = r["after"]
-    branch = r["ref"]
-    commits = r['commits']
-    for commit in commits:
-        committer_mail = commit['author']['email']
-    lock.acquire()
-    os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
-    lista.append(before)
-    lista.append(after)
-    lista.append(branch)
-    br = re.search(r'/[a-zA-Z]+g', branch)
-    os.system('echo "git checkout to dir git"')
-    os.system(f"git -C git/ checkout {after}")
-    os.system('echo "docker rm"')
-    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
-    os.system('echo "docker build db"')
-    os.system("docker build . -t mysql_db:1.0  -f git/Billing/db/Dockerfile")
-    os.system('echo "docker build billing"')
-    os.system("docker build . -t billing_server:1.0 -f git/Billing/app/Dockerfile")
-    os.system('echo "docker compose up"')
-    os.system('docker build . -t weight_server:1.0 -f git/Weight/app-weight/Dockerfile')
-    os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
-    os.system('docker-compose -f git/Weight/docker-compose.yaml --env-file ./git/Weight/config/.env.dev up --detach')
-
-    time.sleep(20)
-
-    os.system('echo "run the tests"')
-    os.system("./git/Billing/test_batch.sh")
-    os.system('echo "docker rm"')
-#    os.system("docker rm -f mysql-flask-app-container python-flask-app-container")
-#    os.system("rm -r git")
-#    os.system("mkdir git")
-#     if test_result == True:
-#         os.system(f"git checkout {br}")
-#         os.system(f"git merge {after}")
-#         os.system(f"git push origin {branch}")
-#         send_email(f"Commit on branch {branch} - tests passed.", f"Bravo {committer_mail}! Tests results:", committer_mail)
-#     else:
-#         send_email(f"Commit on branch {branch} - tests not passed.", f"Sorry {committer_mail}, Tests results:", committer_mail)
-    lock.release()
-
-    return jsonify(success=True)
 
 
 @app.route("/home")
