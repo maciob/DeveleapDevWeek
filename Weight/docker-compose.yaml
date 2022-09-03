@@ -7,7 +7,7 @@ services:
     ports:
       - "${PORT_SERVER}:5000"
     networks:
-      - "mynet"
+      - mynet
 
   mydb:
     container_name: mysqlcont
@@ -17,7 +17,7 @@ services:
     depends_on:
       - app
     networks:
-      - "mynet"
+      - mynet
     command: --init-file /data/application/init.sql
     volumes:
         - /app/git/Weight/database/weight.sql:/data/application/init.sql
@@ -29,3 +29,7 @@ services:
 volumes:
   flask_app_volume:
     name: flask_app_volume
+
+networks:
+  mynet:
+    name: mynet
