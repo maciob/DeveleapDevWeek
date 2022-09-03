@@ -33,7 +33,7 @@ def continuous_integration():
     commits = r['commits']
     for commit in commits:
         committer_mail = commit['author']['email']
-
+#asd
     lock.acquire()
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
     os.system("rm -r git")
