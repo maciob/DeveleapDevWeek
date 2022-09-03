@@ -43,7 +43,7 @@ def home():
 @app.route('/env')
 def env():
     resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
-    odp = "</br>".join(resp)
+    odp = " </br> ".join(resp)
     return render_template("env.html", env=odp, title="ENV")
 
 
