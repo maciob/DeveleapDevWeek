@@ -1,6 +1,6 @@
 version: '3.7' 
 services: 
-  billingapp:
+  billingappprod:
     image: "${VERSIONAPP}"
     container_name: "${NAME_APP}"
     ports:
@@ -9,7 +9,7 @@ services:
      - /app/git/Billing/app/in:/app/in
     networks:
      - mynet
-  mysqlbilling:
+  mysqlbillingprod:
     image: "${VERSIONMYSQL}"
     container_name: "${NAME_DB}"
     ports:
@@ -19,7 +19,7 @@ services:
     networks:
      - mynet
     depends_on:
-     - billingapp
+     - billingappprod
 
 networks:
   mynet:

@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  WeightApp:
+  WeightAppprod:
     container_name: "${NAME_APP}"
     image: "${VERSION}"
     build: /app/git/Weight/app-weight
@@ -9,13 +9,13 @@ services:
     networks:
       - mynet
 
-  WeightMysql:
+  WeightMysqlprod:
     container_name: "${NAME_DB}"
     image: mysql:latest
     ports:
       - "${PORT_DB}:3306"
     depends_on:
-      - WeightApp
+      - WeightAppprod
     networks:
       - mynet
     command: --init-file /data/application/init.sql
