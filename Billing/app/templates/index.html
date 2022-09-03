@@ -34,6 +34,7 @@
                   <li><a class="dropdown-item" href="#">Check billing data</a></li>
                   <li><a class="dropdown-item" href="{{ url_for('ip') }}">Check ip</a></li>
                   <li><a class="dropdown-item" href="{{ url_for('env') }}">Check env data</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('health') }}">Check health</a></li>
                 </ul>
               </li>
             </ul>
@@ -45,7 +46,7 @@
       <div class="row">
         <div class="col-md-8 offset-md-2">
         {% block content %}<h1>Welcome to Billing team Homepage!</h1>
-        <p class="lead">Pick what you want to do from the navbar</p>{% endblock %}
+        <p class="lead">Pick what you want to do from the navbar!</p>{% endblock %}
         </div>
     </div>
   </div>

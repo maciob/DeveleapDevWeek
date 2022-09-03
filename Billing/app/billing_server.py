@@ -44,7 +44,7 @@ def home():
 def env():
     resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
     odp = "</br>".join(resp)
-    return render_template("env.html", env=str(odp), title="ENV")
+    return render_template("env.html", env=str(odp), title="ENV data for debug")
 
 
 @app.route("/monitor", methods=["GET", "POST"])
@@ -66,7 +66,7 @@ def health():
             dependiences["Database"] = "OK"
             cur.close()
             conn.close()
-            return dependiences
+            return render_template("health.html", status=dependiences, title="Health status")
     except:
         dependiences["Database"] = "DOWN"
         return dependiences
