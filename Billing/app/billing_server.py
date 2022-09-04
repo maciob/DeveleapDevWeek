@@ -219,6 +219,27 @@ def updadate_(id):
         # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
         weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return jsonify(weight_response)
+    
+@app.route("/trucks/<id>", methods=["GET","POST"])
+def update_truck_html(id):
+    if request.method == "GET":
+        now = datetime.now()
+        month = now.strftime("%m")
+        year = now.strftime("%Y")
+        current_time = now.strftime("%Y%m%d%H%M%S")
+        truck_id = id
+        t1 = request.form.get("t1", f"{year}01{month}000000")
+        t2 = request.form.get("t2", current_time)
+        # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
+        weight_response = {"id": truck_id, "t1": t1, "t2": t2}
+        data =str(weight_response)
+        return render_template("update_trucks.html", status=data, ids=id, title="Update Trucks data")
+    if request.method == "POST":
+        name = request.form["provider"]
+        response = requests.put(f"http://{request.environ['HTTP_HOST']}/truck/{id}", data = {'provider':f'{name}'})
+        # return inf
+        return response.content
+        
 
 
 @app.route("/rates", methods=["POST", "GET"])

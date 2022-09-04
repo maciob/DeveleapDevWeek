@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <h1>{% block title %} {{ title }} {% endblock %}</h1>
+    <p>Insert id of truck that u want to update in the web adress. For example: /truck/12345 </p>
+    <p> All trucks: {{status}} </p>
+    
+    
+    <form method="post" target="response_frame">
+        <div class="input-group mb-3">
+            <span class="input-group-text">Provider NAME</span>
+        <input type="text" class="form-control"  placeholder="Type new company name here for truck: {{ids}}" name="provider">
+        <button class="btn btn-outline-secondary" type="submit">Submit</button>
+        </div>
+    </form>
+    <div class="container">
+        <iframe name="response_frame"></iframe>
+</div> 
+   
+{% endblock %}
