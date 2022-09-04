@@ -236,7 +236,7 @@ def update_truck_html(id):
         return render_template("update_trucks.html", status=data, ids=id, title="Update Trucks data")
     if request.method == "POST":
         name = request.form["provider"]
-        response = requests.put(f"http://{request.environ['HTTP_HOST']}/truck/{id}", data = {'provider':f'{name}'})
+        response = requests.put(f"http://{request.environ['HTTP_HOST']}/truck/{id}", data = {'provider':f'{name}', "id":f"{id}"})
         # return inf
         return response.content
         
