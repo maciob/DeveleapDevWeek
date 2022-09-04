@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from asyncio import proactor_events
+from crypt import methods
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
@@ -190,6 +191,22 @@ def add_truck():
         # data = jsonify(trucks)
         return render_template("trucks.html", status=trucks, title="Add truck")
 
+# def getBaseHost(url):
+#     list = url.split(":")
+#     host = list[0]
+#     port = list[1]
+#     if port == '8086':
+#         new_port = '8084'
+#     else:
+#         new_port = '8080'
+#     return host,new_port
+
+def getCurrentTime():
+    now = datetime.now()
+    month = now.strftime("%m")
+    year = now.strftime("%Y")
+    current_time = now.strftime("%Y%m%d%H%M%S")
+    return month,year,current_time
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
@@ -209,16 +226,13 @@ def updadate_(id):
         conn.close()
         return "OK"
     if request.method == "GET":
-        now = datetime.now()
-        month = now.strftime("%m")
-        year = now.strftime("%Y")
-        current_time = now.strftime("%Y%m%d%H%M%S")
-        truck_id = id
+        month,year,current_time = getCurrentTime()
+        truck_id = str(id)
         t1 = request.form.get("t1", f"{year}01{month}000000")
         t2 = request.form.get("t2", current_time)
-        # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
-        weight_response = {"id": truck_id, "t1": t1, "t2": t2}
-        return jsonify(weight_response)
+        weight_response = requests.get(f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}")
+        #weight_response = {"id": truck_id, "t1": t1, "t2": t2}
+        return weight_response.content
     
 @app.route("/trucks/<id>", methods=["GET","POST"])
 def update_truck_html(id):
@@ -278,6 +292,22 @@ def rates():
         conn.close()
         return "Inserted into DB successfully"
 
+@app.route("/bill/<id>", methods=['GET'])
+def get_bill(id):
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute(f"SELECT name from Provider WHERE id = {id};")
+    conn.commit()
+    provider_name = cur.fetchone()
+    cur.close()
+    conn.close()
+    month,year,current_time = getCurrentTime()
+    t1 = request.form.get("t1", f"{year}01{month}000000")
+    t2 = request.form.get("t2", current_time)
+    bill={"id": id, "name": provider_name[0], "from": t1, "to": t2}
+    
+
+    return jsonify(bill)
 
 if __name__ == "__main__":
     run()
