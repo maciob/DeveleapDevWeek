@@ -78,7 +78,7 @@ def add_provider():
     if request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider;")
+        cur.execute(f"SELECT * FROM Provider ORDER BY 'id';")
         data = cur.fetchall()
         cur.close()
         conn.close()
@@ -130,7 +130,7 @@ def update_provider(id):
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider;")
+        cur.execute(f"SELECT * FROM Provider ORDER BY 'id';")
         data = cur.fetchall()
         cur.close()
         conn.close()
