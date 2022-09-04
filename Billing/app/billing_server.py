@@ -277,7 +277,7 @@ def rates():
         cur.close()
         conn.close()
         return "Inserted into DB successfully"
-
+#
 @app.route("/prates", methods=["POST", "GET"])
 def prates():
     if request.method == "GET":
