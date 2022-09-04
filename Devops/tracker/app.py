@@ -62,7 +62,7 @@ def continuous_integration():
     os.system('echo "docker compose up --remove-orphans"')
     os.system("docker-compose -f git/Billing/docker-compose.yml --env-file ./git/Billing/config/.env.dev up --detach")
     os.system('echo "docker compose up --remove-orphans"')
-    os.system("docker compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.dev up --detach")
+    os.system("docker-compose -f git/Weight/docker-compose.yml --env-file ./git/Weight/config/.env.dev up --detach")
 
     time.sleep(20)
 
