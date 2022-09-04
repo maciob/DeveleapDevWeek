@@ -38,6 +38,7 @@ def continuous_integration():
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
     #os.system("rm -r git")
     #os.system("mkdir git")
+
     if os.path.isdir("/git")==True:
         os.system("git -C git pull")
     else:
@@ -46,6 +47,7 @@ def continuous_integration():
     lista.append(after)
     lista.append(branch)
     branch_name = re.search(r'/[a-zA-Z]+g', branch)
+    os.system("git -C git/ stash")
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git/ checkout {after}")
     os.system('echo "docker build db"')
