@@ -187,8 +187,8 @@ def add_truck():
         trucks = cur.fetchall()
         cur.close()
         conn.close()
-        data = jsonify(trucks)
-        return render_template("trucks.html", status=data, title="Trucks data")
+        # data = jsonify(trucks)
+        return render_template("trucks.html", status=trucks, title="Trucks data")
 
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
