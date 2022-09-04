@@ -40,6 +40,12 @@ def run():
 def home():
     return render_template("index.html")
 
+@app.route('/env')
+def env():
+    resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
+    odp = " \t ".join(resp)
+    return render_template("env.html", env=str(odp), title="ENV data for debug")
+
 
 @app.route("/monitor", methods=["GET", "POST"])
 def monitor():
@@ -60,10 +66,10 @@ def health():
             dependiences["Database"] = "OK"
             cur.close()
             conn.close()
-            return dependiences
+            return render_template("health.html", status=dependiences, title="Health status")
     except:
         dependiences["Database"] = "DOWN"
-        return dependiences
+        return render_template("health.html", status=dependiences, title="Health status")
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -72,7 +78,7 @@ def add_provider():
     if request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider")
+        cur.execute(f"SELECT * FROM Provider;")
         data = cur.fetchall()
         cur.close()
         conn.close()
@@ -89,6 +95,8 @@ def add_provider():
         else:
             cur.execute(f"INSERT INTO Provider (`name`) VALUES ('{name}');")
             conn.commit()
+            cur.close()
+            conn.close()
             conn = mysql.connect()
             cur = conn.cursor()
             cur.execute(f"SELECT id FROM Provider WHERE name = '{name}';")
@@ -98,25 +106,41 @@ def add_provider():
             return jsonify(id=data)
 
 
-@app.route("/provider/<id>", methods=["PUT"])
+@app.route("/provider/<id>", methods=["PUT","GET","POST"])
 def update_provider(id):
-    name = request.form["username"]
-    conn = mysql.connect()
-    cur = conn.cursor()
-    if not cur.execute(f"SELECT * FROM Provider WHERE id = '{id}';"):
-        cur.close()
-        conn.close()
-        return "No provider with this ID in database.\n"
-    else:
-        cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
-        conn.commit()
+    if request.method == "PUT":
+        name = request.form["username"]
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
-        data = cur.fetchone()
+        if not cur.execute(f"SELECT * FROM Provider WHERE id = '{id}';"):
+            cur.close()
+            conn.close()
+            return "No provider with this ID in database.\n"
+        else:
+            cur.execute(f"UPDATE Provider SET name = '{name}' WHERE id = '{id}';")
+            conn.commit()
+            conn = mysql.connect()
+            cur = conn.cursor()
+            cur.execute(f"SELECT id,name FROM Provider WHERE id = '{id}';")
+            data = cur.fetchone()
+            cur.close()
+            conn.close()
+            return jsonify(data)
+        
+    elif request.method == "GET":
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM Provider;")
+        data = cur.fetchall()
         cur.close()
         conn.close()
-        return jsonify(data)
+        return render_template("update_provider.html", providers=data, title="Update provider name" ,ids=id)
+    
+    elif request.method == "POST":
+        name = request.form["username"]
+        response = requests.put(f"http://{request.environ['HTTP_HOST']}/provider/{id}", data = {'username':f'{name}'})
+        # return inf
+        return response.content
 
 
 @app.route("/ip", methods=["GET"])
@@ -154,7 +178,7 @@ def add_truck():
         cur.close()
         conn.close()
         return jsonify(trucks)
-
+    #shadow
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -163,7 +187,8 @@ def add_truck():
         trucks = cur.fetchall()
         cur.close()
         conn.close()
-        return jsonify(trucks)
+        # data = jsonify(trucks)
+        return render_template("trucks.html", status=trucks, title="Trucks data")
 
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
