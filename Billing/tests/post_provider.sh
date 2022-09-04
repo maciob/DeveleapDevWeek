@@ -8,7 +8,7 @@
 echo " "
 echo $0
 echo " "
-curl -d "username=pro1" -X POST 18.170.241.119:8086/provider | tac | tac | grep -a "already" 
+curl -i -d "username=pro1" -X POST 18.170.241.119:8086/provider | tac | tac | grep -a "200" 
 if [ $? == 0 ]; then
     echo "Passed."
 else
