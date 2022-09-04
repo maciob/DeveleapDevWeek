@@ -7,12 +7,26 @@ from datetime import datetime
 import csv
 import json
 import socket
+from werkzeug.utils import secure_filename  
+import os
+from dotenv import load_dotenv 
+from functions import handle_out,handle_in,handle_none,handle_files
+
 # import mysql.connector
 
 
-app = Flask(__name__)
+load_dotenv()
+basedir = os.path.abspath(os.path.dirname(__file__))
 
-number = 1
+class Config(object):
+    UPLOAD_FOLDER = os.path.join(basedir, './in')
+    ALLOWED_EXTENSIONS = {'csv','json'}
+    SESSION_TYPE = 'session'
+
+
+app = Flask(__name__)
+app.config.from_object(Config)  #1
+app.secret_key = "@#dsfs$!!fsgsg342424"
 
 def get_ip():
     hostname = socket.gethostname()
@@ -162,13 +176,17 @@ def home():
     return f"<h1>Home page of weight team app</h1>"
     
 
-@app.route("/batch-weight",methods=["GET","POST"])
-def batch_weight(): 
-    if request.method == "POST":
-        details = request.form
-        file = details['file']
-        handling_files(file)
-    return render_template("batch.html")
+@app.route('/batch-weight', methods = ['GET', 'POST']) 
+def upload_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      filename = secure_filename(f.filename)
+      f.save(os.path.join(Config.UPLOAD_FOLDER, filename))
+      handle_files(filename)
+      return f"You've uploaded file - {filename}"
+   
+   else:
+        return render_template('upload.html') 
 
 
 @app.route("/unknown",methods=["GET"])
