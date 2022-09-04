@@ -1,8 +1,19 @@
 import mysql.connector
 import json
+import socket
+
+
+def get_ip():
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    temp_list = IPAddr.split(".")
+    last_digit = int(temp_list[3]) + 1
+    temp_list[3] = str(last_digit)
+    new_IP = ".".join(temp_list)
+    return (IPAddr, new_IP)
 
 def getMysqlConnection():
-     return mysql.connector.connect(user='root', host='172.17.0.2', port='3306', password='password', database='weight')
+     return mysql.connector.connect(user='root', host=f"{get_ip()[1]}", port='3306', password='password', database='weight')
 
 
 
