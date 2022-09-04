@@ -1,7 +1,7 @@
  
 ./get_health.sh
  
-{"Database":"OK"}
+    <p>{&#39;Database&#39;: &#39;OK&#39;}</p>
 Passed.
  
 ./get_monitor.sh
