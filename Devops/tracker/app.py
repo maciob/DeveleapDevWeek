@@ -1,4 +1,5 @@
 import smtplib
+from email.message import EmailMessage
 from email.mime.text import MIMEText
 from flask import Flask, jsonify, request
 import json
@@ -16,6 +17,9 @@ mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus
                 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
 
 testingflag = False
+
+email_address = "mbekasinzynierka@gmail.com"
+email_password = "ynfrjwnpkzqysazy"
 
 
 @app.route("/monitor", methods=["POST"])
@@ -38,16 +42,18 @@ def continuous_integration():
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
     #os.system("rm -r git")
     #os.system("mkdir git")
-    if os.path.isdir("/git")==True:
+    if os.path.isdir("git")==True:
         os.system("git -C git pull")
+        os.system("git -C git stash")
     else:
         os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
     lista.append(before)
     lista.append(after)
     lista.append(branch)
     branch_name = re.search(r'/[a-zA-Z]+g', branch)
+    #os.system("git -C git/ stash")
     os.system('echo "git checkout to dir git"')
-    os.system(f"git -C git/ checkout {after}")
+    os.system(f"git -C git checkout {after}")
     os.system('echo "docker build db"')
     os.system("docker build . -t mysql_db:1.0  -f git/Billing/db/Dockerfile")
     os.system('echo "docker build billing"')
@@ -66,7 +72,7 @@ def continuous_integration():
     result = subprocess.Popen("./git/Billing/test_batch.sh")
     text = result.communicate()[0]
     return_code = result.returncode
-    lock.release()
+    #lock.release()
     os.system('echo "docker rm"')
 
     #os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
@@ -75,6 +81,8 @@ def continuous_integration():
     subject_fail = f"Commit on branch {branch} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
     message_fail = f"Sorry! Your commit {after} passed only {return_code} tests."
+
+    msg = EmailMessage()
     if return_code == 100 and "master" in branch:
         # os.system(f"git checkout {br}")
         # os.system(f"git merge {after}")
@@ -88,35 +96,34 @@ def continuous_integration():
         os.system("docker-compose -f git/Billing/prod.yml --env-file ./git/Billing/config/.env.prod up --detach")
         os.system('echo "docker compose up"')
         os.system("docker-compose -f git/Weight/prod.yml --env-file ./git/Weight/config/.env.prod up --detach")
+
     elif return_code == 100 and "master" not in branch:
         os.system('echo "success"')
-        #send_email(subject_pass, message_pass, committer_mail)
+
+        msg['Subject'] = subject_pass
+        msg['From'] = email_address
+        msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
+#        msg['To'] = 'bekasmaciej@gmail.com'
+        msg.set_content(message_pass)
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(email_address, email_password)
+            smtp.send_message(msg)
+
     else:
         os.system('echo "fail"')
-        #send_email(subject_fail, message_fail, committer_mail)
-    #lock.release()
+        msg['Subject'] = subject_fail
+        msg['From'] = email_address
+        msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
+#       msg['To'] = 'bekasmaciej@gmail.com'
+        msg.set_content(message_fail)
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(email_address, email_password)
+            smtp.send_message(msg)
+
+
+    lock.release()
 
     return jsonify(success=True)
-
-
-def send_email(subject, message, receiver_mail):
-    global mailing_list
-    #  sends an email with feedback to committer, team leaders and devops team
-    os.system('echo "tu tez bylem"')
-    msg = MIMEText(message, 'plain')
-    msg['Subject'] = subject
-    port = 587
-    my_mail = 'blueteamdevops@outlook.com'
-    my_password = 'G00gleit'
-    with smtplib.SMTP('smtp-mail.outlook.com', port) as server:
-        server.starttls()
-        server.login(my_mail, my_password)
-        for mail in mailing_list:
-            os.system(f'echo "{mail}"')
-            server.sendmail(my_mail, mail, f"CC: {msg.as_string()}")
-        if receiver_mail not in mailing_list:
-            server.sendmail(my_mail, receiver_mail, msg.as_string())
-        server.quit()
 
 
 @app.route("/home")
