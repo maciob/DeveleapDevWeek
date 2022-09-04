@@ -25,13 +25,14 @@
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">Actions</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdown">
                   <li><a class="dropdown-item" href="{{ url_for('add_provider') }}">Add provider</a></li>
-                  <li><a class="dropdown-item" href="#">Update provider name</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('update_provider') }}">Update provider name</a></li>
                   <li><a class="dropdown-item" href="#">Add truck data</a></li>
                   <li><a class="dropdown-item" href="#">Update truck data</a></li>
-                  <li><a class="dropdown-item" href="#">Download rates</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('rates') }}">Download rates</a></li>
                   <li><a class="dropdown-item" href="#">Post new rates</a></li>
                   <li><a class="dropdown-item" href="#">Check truck data</a></li>
                   <li><a class="dropdown-item" href="#">Check billing data</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('ip') }}">Check ip</a></li>
                 </ul>
               </li>
             </ul>
@@ -42,8 +43,8 @@
   <div class="container">
       <div class="row">
         <div class="col-md-8 offset-md-2">
-        {% block content %}<h1>Billing</h1>
-        <p class="lead">Pick what you want to do from the navbar </p>{% endblock %}
+        {% block content %}<h1>Welcome to Billing team Homepage!</h1>
+        <p class="lead">Pick what you want to do from the navbar</p>{% endblock %}
         </div>
     </div>
   </div>
