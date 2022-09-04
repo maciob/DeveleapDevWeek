@@ -39,17 +39,18 @@ def continuous_integration():
     #os.system("rm -r git")
     #os.system("mkdir git")
 
-    if os.path.isdir("/git")==True:
+    if os.path.isdir("git")==True:
         os.system("git -C git pull")
+        os.system("git -C git stash")
     else:
         os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
     lista.append(before)
     lista.append(after)
     lista.append(branch)
     branch_name = re.search(r'/[a-zA-Z]+g', branch)
-    os.system("git -C git/ stash")
+    #os.system("git -C git/ stash")
     os.system('echo "git checkout to dir git"')
-    os.system(f"git -C git/ checkout {after}")
+    os.system(f"git -C git checkout {after}")
     os.system('echo "docker build db"')
     os.system("docker build . -t mysql_db:1.0  -f git/Billing/db/Dockerfile")
     os.system('echo "docker build billing"')
