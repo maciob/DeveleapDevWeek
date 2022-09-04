@@ -40,7 +40,8 @@ def run():
 def home():
     return render_template("index.html")
 
-@app.route('/env')
+
+@app.route("/env")
 def env():
     resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
     odp = " \t ".join(resp)
@@ -66,10 +67,14 @@ def health():
             dependiences["Database"] = "OK"
             cur.close()
             conn.close()
-            return render_template("health.html", status=dependiences, title="Health status")
+            return render_template(
+                "health.html", status=dependiences, title="Health status"
+            )
     except:
         dependiences["Database"] = "DOWN"
-        return render_template("health.html", status=dependiences, title="Health status")
+        return render_template(
+            "health.html", status=dependiences, title="Health status"
+        )
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -106,7 +111,7 @@ def add_provider():
             return jsonify(id=data)
 
 
-@app.route("/provider/<id>", methods=["PUT","GET","POST"])
+@app.route("/provider/<id>", methods=["PUT", "GET", "POST"])
 def update_provider(id):
     if request.method == "PUT":
         name = request.form["username"]
@@ -126,7 +131,7 @@ def update_provider(id):
             cur.close()
             conn.close()
             return jsonify(data)
-        
+
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -134,18 +139,23 @@ def update_provider(id):
         data = cur.fetchall()
         cur.close()
         conn.close()
-        return render_template("update_provider.html", providers=data, title="Update provider name" ,ids=id)
-    
+        return render_template(
+            "update_provider.html", providers=data, title="Update provider name", ids=id
+        )
+
     elif request.method == "POST":
         name = request.form["username"]
-        response = requests.put(f"http://{request.environ['HTTP_HOST']}/provider/{id}", data = {'username':f'{name}'})
+        response = requests.put(
+            f"http://{request.environ['HTTP_HOST']}/provider/{id}",
+            data={"username": f"{name}"},
+        )
         # return inf
         return response.content
 
 
 @app.route("/ip", methods=["GET"])
 def ip():
-    resp=f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+    resp = f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
     # return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
     return render_template("ip.html", ip=resp, title="IP")
 
@@ -219,8 +229,9 @@ def updadate_(id):
         # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
         weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return jsonify(weight_response)
-    
-@app.route("/trucks/<id>", methods=["GET","POST"])
+
+
+@app.route("/trucks/<id>", methods=["GET", "POST"])
 def update_truck_html(id):
     if request.method == "GET":
         conn = mysql.connect()
@@ -230,13 +241,17 @@ def update_truck_html(id):
         trucks = cur.fetchall()
         cur.close()
         conn.close()
-        return render_template("update_truck.html", status=trucks, ids=id, title="Update Trucks data")
+        return render_template(
+            "update_truck.html", status=trucks, ids=id, title="Update Trucks data"
+        )
     if request.method == "POST":
         name = request.form["provider"]
-        response = requests.put(f"http://{request.environ['HTTP_HOST']}/truck/{id}", data = {'provider':f'{name}'})
+        response = requests.put(
+            f"http://{request.environ['HTTP_HOST']}/truck/{id}",
+            data={"provider": f"{name}"},
+        )
         # return inf
         return response.content
-        
 
 
 @app.route("/rates", methods=["POST", "GET"])
@@ -245,11 +260,11 @@ def rates():
         # book = load_workbook("in/rates.xlsx")
         # sheet = book.active
         # return render_template("s3_excel_table.html", sheet=sheet)
-        path = r'/app/in/rates.xlsx'
+        path = r"/app/in/rates.xlsx"
         return send_file(path, as_attachment=True)
-#
+    #
     elif request.method == "POST":
-        excel_data = pd.read_excel(r'/app/in/rates.xlsx')
+        excel_data = pd.read_excel(r"/app/in/rates.xlsx")
         # Read the values of the file in the dataframe
         data = pd.DataFrame(excel_data, columns=["Product", "Rate", "Scope"])
         conn = mysql.connect()
@@ -258,7 +273,7 @@ def rates():
         conn.commit()
         cur.close()
         conn.close()
-        # 
+        #
         conn = mysql.connect()
         cur = conn.cursor()
         for i in range(len(data.index)):
@@ -277,6 +292,8 @@ def rates():
         cur.close()
         conn.close()
         return "Inserted into DB successfully"
+
+
 #
 @app.route("/prates", methods=["POST", "GET"])
 def prates():
@@ -285,6 +302,7 @@ def prates():
     if request.method == "POST":
         response = requests.post(f"http://{request.environ['HTTP_HOST']}/rates")
         return response.content
-    
+
+
 if __name__ == "__main__":
     run()
