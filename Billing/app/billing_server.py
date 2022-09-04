@@ -278,6 +278,13 @@ def rates():
         conn.close()
         return "Inserted into DB successfully"
 
-
+@app.route("/prates", methods=["POST", "GET"])
+def prates():
+    if request.method == "GET":
+        return render_template("rates.html", title="Post rates")
+    if request.method == "POST":
+        response = requests.post(f"http://{request.environ['HTTP_HOST']}/rates")
+        return response.content
+    
 if __name__ == "__main__":
     run()
