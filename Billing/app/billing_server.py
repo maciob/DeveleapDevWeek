@@ -78,7 +78,7 @@ def add_provider():
     if request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider;")
+        cur.execute(f"SELECT * FROM Provider ORDER BY 'id';")
         data = cur.fetchall()
         cur.close()
         conn.close()
@@ -130,7 +130,7 @@ def update_provider(id):
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM Provider;")
+        cur.execute(f"SELECT * FROM Provider ORDER BY 'id';")
         data = cur.fetchall()
         cur.close()
         conn.close()
@@ -178,7 +178,7 @@ def add_truck():
         cur.close()
         conn.close()
         return jsonify(trucks)
-    #shadow
+
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -188,7 +188,7 @@ def add_truck():
         cur.close()
         conn.close()
         # data = jsonify(trucks)
-        return render_template("trucks.html", status=trucks, title="Trucks data")
+        return render_template("trucks.html", status=trucks, title="Add truck")
 
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
@@ -219,6 +219,24 @@ def updadate_(id):
         # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
         weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return jsonify(weight_response)
+    
+@app.route("/trucks/<id>", methods=["GET","POST"])
+def update_truck_html(id):
+    if request.method == "GET":
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute(f"SELECT * FROM Trucks;")
+        conn.commit()
+        trucks = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template("update_truck.html", status=trucks, ids=id, title="Update Trucks data")
+    if request.method == "POST":
+        name = request.form["provider"]
+        response = requests.put(f"http://{request.environ['HTTP_HOST']}/truck/{id}", data = {'provider':f'{name}'})
+        # return inf
+        return response.content
+        
 
 
 @app.route("/rates", methods=["POST", "GET"])
@@ -259,7 +277,14 @@ def rates():
         cur.close()
         conn.close()
         return "Inserted into DB successfully"
-
-
+#
+@app.route("/prates", methods=["POST", "GET"])
+def prates():
+    if request.method == "GET":
+        return render_template("rates.html", title="Post rates")
+    if request.method == "POST":
+        response = requests.post(f"http://{request.environ['HTTP_HOST']}/rates")
+        return response.content
+    
 if __name__ == "__main__":
     run()
