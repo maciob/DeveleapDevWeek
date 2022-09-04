@@ -28,7 +28,6 @@ def health():
     return jsonify(success=True)
 
 
-#asd
 @app.route("/api", methods=["POST"])
 def continuous_integration():
     r = request.json
@@ -96,7 +95,7 @@ def continuous_integration():
         os.system("docker-compose -f git/Billing/prod.yml --env-file ./git/Billing/config/.env.prod up --detach")
         os.system('echo "docker compose up"')
         os.system("docker-compose -f git/Weight/prod.yml --env-file ./git/Weight/config/.env.prod up --detach")
-
+    
     elif return_code == 100 and "master" not in branch:
         os.system('echo "success"')
 
@@ -105,10 +104,13 @@ def continuous_integration():
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
 #        msg['To'] = 'bekasmaciej@gmail.com'
         msg.set_content(message_pass)
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login(email_address, email_password)
-            smtp.send_message(msg)
-
+        try:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                smtp.login(email_address, email_password)
+                smtp.send_message(msg)
+        except:
+            print("Failure in sending mail")
+            pass
     else:
         os.system('echo "fail"')
         msg['Subject'] = subject_fail
@@ -116,11 +118,13 @@ def continuous_integration():
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
 #       msg['To'] = 'bekasmaciej@gmail.com'
         msg.set_content(message_fail)
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login(email_address, email_password)
-            smtp.send_message(msg)
-
-
+        try:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                smtp.login(email_address, email_password)
+                smtp.send_message(msg)
+        except:
+            print("Failure in sending mail")
+            pass
     lock.release()
 
     return jsonify(success=True)
