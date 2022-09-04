@@ -191,15 +191,15 @@ def add_truck():
         # data = jsonify(trucks)
         return render_template("trucks.html", status=trucks, title="Add truck")
 
-# def getBaseHost(url):
-#     list = url.split(":")
-#     host = list[0]
-#     port = list[1]
-#     if port == '8086':
-#         new_port = '8084'
-#     else:
-#         new_port = '8080'
-#     return host,new_port
+def getBaseHost(url):
+    list = url.split(":")
+    host = list[0]
+    port = list[1]
+    if port == '8086':
+        new_port = '8084'
+    else:
+        new_port = '8080'
+    return host,new_port
 
 def getCurrentTime():
     now = datetime.now()
@@ -230,7 +230,9 @@ def updadate_(id):
         truck_id = str(id)
         t1 = request.form.get("t1", f"{year}01{month}000000")
         t2 = request.form.get("t2", current_time)
-        weight_response = requests.get(f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}")
+        host, new_port = getBaseHost(request.environ['HTTP_HOST'])
+        url_for_request = host + ':' + new_port
+        weight_response = requests.get(f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}")
         #weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return weight_response.content
     
@@ -298,13 +300,30 @@ def get_bill(id):
     cur = conn.cursor()
     cur.execute(f"SELECT name from Provider WHERE id = {id};")
     conn.commit()
-    provider_name = cur.fetchone()
+    provider_name = cur.fetchall()
+    cur.execute(f"SELECT COUNT(id) FROM Trucks WHERE provider_id={id};")
+    truck_count = cur.fetchall()
+    cur.execute(f"SELECT id FROM Trucks WHERE provider_id={id};")
+    truck_ids = cur.fetchall()
+    truck_ids_list = list(map(lambda x: x[0], truck_ids))
     cur.close()
     conn.close()
+    session_count = 0
+    total = 0
+    products = []
+    single_product = {}
+    for truck_id in truck_ids_list:
+        weight_item = requests.get(f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}")
+        #GET SESSIONS LIST FOR THAT TRUCK, return lenght, add lenght to session_count
+        #GET with ID of ever session of this truck > /GET sessions, parse 'neto'
+        #get product name from GET /weight ???
+   
+
     month,year,current_time = getCurrentTime()
     t1 = request.form.get("t1", f"{year}01{month}000000")
     t2 = request.form.get("t2", current_time)
-    bill={"id": id, "name": provider_name[0], "from": t1, "to": t2}
+    #trucks_ids for testing only
+    bill={"id": id, "name": provider_name[0], "from": t1, "to": t2, "truckCount": truck_count[0], "trucks_ids": truck_ids_list, "products": products, "total": total}
     
 
     return jsonify(bill)
