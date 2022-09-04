@@ -52,69 +52,66 @@ mysql.init_app(app)
 
 @app.route("/weight", methods=["GET","POST"])
 def weight():
-    
- if request.method == "POST":
-    details = request.form                      #Assigning data from form to variables
-    id = details["id"]
-    direction = details["direction"]
-    truck_license = details["truck_license"]
-    containers = details["containers"]
-    type_product = details["type_product"]
-    date_created = details["date_created"]
-    weight = details["weight"]
-    conn = mysql.connect()
-    cur = conn.cursor()
-    if direction == "in":
-        try:
-            global number
-            id = number
-            number += 1
-            cur.execute("INSERT INTO transactions(id,datetime,direction,truck,containers,bruto,produce) VALUES (%s, %s, %s,%s, %s, %s,%s)", (id,date_created,direction,truck_license,containers,weight,type_product))
-            data = {}
-            data['id'] = id
-            data['truck'] = truck_license
-            data['bruto'] = weight
-            json_data = json.dumps(data)
-            return json_data
-        except:
-            return 'Error'
-    elif direction == "out":
-        try:
-            truckTara = details["weight"]
-            cur.execute("SELECT * FROM containers_registered")
-            containers_database = cur.fetchall()
-            cur.execute(f"SELECT containers FROM transactions WHERE id='{id}'")
-            containers_declared = cur.fetchall()
-            containers_declared = list(containers_declared[0])
-            containers_declared= containers_declared[0].split(",")
-            sum = 0
-            for container in containers_declared:
-                for container_db in containers_database:
-                    if container == container_db[0]:
-                        sum += container_db[1]
-            cur.execute(f"SELECT bruto FROM transactions WHERE id='{id}'")
-            brutto = cur.fetchall()
-            brutto = brutto[0][0]
-            netto = int(brutto) - int(weight) - sum
-            cur.execute(f"INSERT INTO transactions(truckTara,neto) VALUES (%s, %s)", (truckTara,netto))
-            cur.execute(f"UPDATE transactions SET direction = '{direction}' WHERE id = '{id}'")
-            cur.execute(f"SELECT id,truck,bruto,truckTara FROM transactions WHERE id={id}")
+    if request.method == "POST":
+        details = request.form                      
+        id = details["id"]
+        direction = details["direction"]
+        truck_license = details["truck_license"]
+        containers = details["containers"]
+        type_product = details["type_product"]
+        if type_product == "":
+            type_product = "na"
+        if truck_license == "":
+            truck_license = "na"
+        date_created = details["date_created"]
+        weight = details["weight"]
+        force = details["force"]
+        conn = getMysqlConnection()
+        cur = conn.cursor()
+        
+        if force == "True":
+            cur.execute(f"SELECT direction FROM transactions WHERE id='{id}'")
             result = cur.fetchall()
-            result = result[0]
-            data = {}
-            data['id'] = result[0]
-            data['truck'] = result[1]
-            data['bruto'] = result[2]
-            data['truckTara'] = truckTara
-            data['neto'] = netto
-            json_data = json.dumps(data)
-            return json_data
-        except:
-            return 'Error'
+            result = result[0][0]
+            if result == direction and result == "in":   
+                cur.execute(f"UPDATE transactions SET bruto = '{weight}', datetime = '{date_created}' WHERE id = '{id}'")
+                return f'New gross weight - {weight}'
 
+            elif result == direction and result == "out":
+                json = handle_out(id,weight,direction,date_created)
+                return f"New data {json}"
+
+            else:
+                return render_template('error.html')
+        
+        elif direction == "in":
+            try:
+                json = handle_in(id,date_created,direction,truck_license,containers,weight,type_product)
+                return json
+            except:
+                return render_template('error.html')
+        
+        elif direction == "out":
+            try:
+                cur.execute(f"SELECT direction FROM transactions WHERE id='{id}'")
+                result = cur.fetchall()
+                result = result[0][0]
+                if result == "out":
+                    return 'You cannot overwrite existing form without force'
+                json = handle_out(id,weight,direction,date_created)
+                return json
+            except:
+               return render_template('error.html')
+        elif direction == "none":
+            try:
+                response = handle_none(direction,containers,weight,date_created)
+                return response
+            except:
+                return render_template('error.html')
+        else:
+            return render_template('error.html')
     else:
-        return render_template("index.html")
-
+        return render_template("form.html")
 
 
 def weight1(t1,t2,arg1):
