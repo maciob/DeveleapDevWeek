@@ -2,7 +2,19 @@
 
 {% block content %}
     <h1>{% block title %} {{ title }} {% endblock %}</h1>
-    <p> All trucks: {{status}} </p>
+    <p> All trucks: {{status}} </p><br>
+    <p> Add a new truck:</p>
+
+    <form method="post" target="response_frame">
+        <div class="input-group mb-3">
+            <span class="input-group-text">Input truck data</span>
+        <input type="text" class="form-control"  placeholder="Company name" name="provider">
+        <input type="text" class="form-control"  placeholder="Truck id" name="id">
+        <button class="btn btn-outline-secondary" type="submit">Submit</button>
+        </div>
+    </form>
+    <div class="container">
+        <iframe name="response_frame"></iframe>
     
     
    
