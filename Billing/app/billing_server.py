@@ -178,7 +178,7 @@ def add_truck():
         cur.close()
         conn.close()
         return jsonify(trucks)
-
+    #shadow
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
