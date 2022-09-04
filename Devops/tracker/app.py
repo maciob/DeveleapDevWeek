@@ -39,8 +39,6 @@ def continuous_integration():
         committer_mail = commit['author']['email']
     lock.acquire()
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
-    #os.system("rm -r git")
-    #os.system("mkdir git")
     if os.path.isdir("git")==True:
         os.system("git -C git pull")
         os.system("git -C git stash")
@@ -50,7 +48,6 @@ def continuous_integration():
     lista.append(after)
     lista.append(branch)
     branch_name = re.search(r'/[a-zA-Z]+g', branch)
-    #os.system("git -C git/ stash")
     os.system('echo "git checkout to dir git"')
     os.system(f"git -C git checkout {after}")
     os.system('echo "docker build db"')
@@ -71,11 +68,8 @@ def continuous_integration():
     result = subprocess.Popen("./git/Billing/test_batch.sh")
     text = result.communicate()[0]
     return_code = result.returncode
-    #lock.release()
     os.system('echo "docker rm"')
 
-    #os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
-    #asd
     subject_pass = f"Commit on branch {branch} - tests passed."
     subject_fail = f"Commit on branch {branch} - tests failed."
     message_pass = f"Congrats! Your commit {after} passed all the tests."
@@ -83,9 +77,6 @@ def continuous_integration():
 
     msg = EmailMessage()
     if return_code == 100 and "master" in branch:
-        # os.system(f"git checkout {br}")
-        # os.system(f"git merge {after}")
-        # os.system(f"git push origin {branch}")
         os.system('echo "stawiamy nowa wersja z mastera"')
         os.system("docker build . -t mysql_db:1.1  -f git/Billing/db/Dockerfile")
         os.system("docker build . -t billing_server:1.1  -f git/Billing/app/Dockerfile")
@@ -102,7 +93,6 @@ def continuous_integration():
         msg['Subject'] = subject_pass
         msg['From'] = email_address
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
-#        msg['To'] = 'bekasmaciej@gmail.com'
         msg.set_content(message_pass)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
@@ -116,7 +106,6 @@ def continuous_integration():
         msg['Subject'] = subject_fail
         msg['From'] = email_address
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
-#       msg['To'] = 'bekasmaciej@gmail.com'
         msg.set_content(message_fail)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
