@@ -170,7 +170,8 @@ def home():
     cur = db.cursor()
     data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
-    return f"<h1>Home page of weight team app</h1>"
+    # return f"<h1>Home page of weight team app</h1>"
+    return render_template('homepage.html') 
     
 
 @app.route('/batch-weight', methods = ['GET', 'POST']) 
@@ -296,5 +297,5 @@ def monitor():
 
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0')
+	app.run(debug=True, host='0.0.0.0')
  
