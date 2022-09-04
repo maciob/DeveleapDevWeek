@@ -38,8 +38,9 @@ def continuous_integration():
     os.system("docker rm -f MYSQL-Billing-app-testing Billing-app-testing Weight-app-testing MYSQL-Weight-app-testing")
     #os.system("rm -r git")
     #os.system("mkdir git")
-    if os.path.isdir("/git")==True:
+    if os.path.isdir("git")==True:
         os.system("git -C git pull")
+        os.system("git -C git stash")
     else:
         os.system("git clone https://github.com/maciob/DeveleapDevWeek git")
     lista.append(before)
