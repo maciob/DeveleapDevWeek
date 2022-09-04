@@ -247,7 +247,7 @@ def rates():
         # return render_template("s3_excel_table.html", sheet=sheet)
         path = r'/app/in/rates.xlsx'
         return send_file(path, as_attachment=True)
-
+#
     elif request.method == "POST":
         excel_data = pd.read_excel(r'/app/in/rates.xlsx')
         # Read the values of the file in the dataframe
