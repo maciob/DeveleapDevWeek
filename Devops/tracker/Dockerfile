@@ -2,6 +2,7 @@ FROM python:3.8
 WORKDIR app/
 COPY requirements.txt requirements.txt
 COPY app.py app.py
+COPY ./conf/app.yml app.yml
 RUN apt-get -y update
 RUN apt-get -y install git
 RUN apt-get -y install apt-transport-https ca-certificates curl software-properties-common

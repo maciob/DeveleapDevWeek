@@ -18,10 +18,10 @@ services:
       - WeightAppprod
     networks:
       - mynet
-    command: --init-file /data/application/init.sql
     volumes:
-        - /app/git/Weight/database/weight.sql:/data/application/init.sql
+        - /app/git/Weight/database/init.sql:/data/application/init.d
         - flask_app_volume:/var/lib/mysql
+    command: --init-file /data/application/init.d
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: weight
