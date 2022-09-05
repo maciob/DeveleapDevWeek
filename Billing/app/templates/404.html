@@ -1,9 +1,10 @@
 {% extends 'index.html' %}
 
-{% block title %}Page Not Found{% endblock %}
-{% block body %}
-<h1>Page Not Found</h1>
-<p>Please check if the page you are looking for exists and make sure that you request is valid.</p>
+{% block content %}
+    <h1>{% block title %} {{ title }} {% endblock %}</h1>
+    <p>{{ env }}</p>
+    
+   
 {% endblock %}
 
 

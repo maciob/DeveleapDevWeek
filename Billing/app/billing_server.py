@@ -402,7 +402,7 @@ def prates():
 @app.errorhandler(404)
 def page_not_found(e):
     # 404 - Page Not Found
-    return render_template("404.html"), 404
+    return render_template("404.html", title="Page not found", env="error 404"), 404
 
 
 @app.errorhandler(500)
