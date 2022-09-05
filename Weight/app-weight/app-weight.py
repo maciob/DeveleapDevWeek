@@ -201,19 +201,13 @@ def upload_file():
 @app.route("/unknown",methods=["GET"])
 def unknown(): 
     
-    if request.method == "GET":
-        users = []
+     if request.method == "GET":
         conn =  mysql1.connect()
         cursor = conn.cursor()
-        query = 'SELECT UserId from <table_name>;'
+        query = 'SELECT * FROM containers_registered WHERE weight IS NULL;'
         cursor.execute(query)
-
-        for  row in cursor:
-            users.append(row['UserId'])
-
-        conn.close()
-
-        return json.dump(users)
+        sessions1 = cursor.fetchall()
+        return jsonify(sessions1)
 
 @app.route("/item/<id>",methods=["GET","POST"]) #1
 def item(id):
