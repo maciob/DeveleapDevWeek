@@ -402,13 +402,13 @@ def prates():
 @app.errorhandler(404)
 def page_not_found(e):
     # 404 - Page Not Found
-    return render_template("404.html", title="Page Not Found", env="Please check if the page you are looking for exists and make sure that you request is valid."), 404
+    return render_template("404.html", title="404 Page Not Found", env="Please check if the page you are looking for exists and make sure that you request is valid."), 404
 
 
 @app.errorhandler(500)
 def page_not_found(e):
     # 500 - Internal Server Error
-    return render_template("500.html", title="Internal Server Error", env="We are sorry for the inconvenience but the server is currently down. Please contact the server administrator to resolve the issue."), 500
+    return render_template("500.html", title="500 Internal Server Error", env="We are sorry for the inconvenience but the server is currently down. Please contact the server administrator to resolve the issue."), 500
 
 
 # Running the Flask app
