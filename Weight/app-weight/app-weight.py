@@ -210,7 +210,7 @@ def item(id):
     arg2 = request.args.get('to', default=datetime.now())
     
     item_truck = getitem(id, arg1, arg2)
-    return json.dumps(item_truck)
+    return jsonify(item_truck)
 
 @app.route("/weight1",methods=["GET", "POST"])
 def weight1():
