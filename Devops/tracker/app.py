@@ -1,5 +1,6 @@
 import smtplib
 from email.message import EmailMessage
+
 from flask import Flask, jsonify, request
 import os
 import threading
@@ -12,10 +13,16 @@ app = Flask(__name__)
 
 lista = []
 lock = threading.Lock()
-mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com',
-                'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
 
 testingflag = False
+
+
+conf = yaml.load(open('app.yml'),Loader=yaml.Loader)
+email_from = str(conf['user']['email'])
+pwd = str(conf['user']['password'])
+
+
+
 
 @app.route("/monitor", methods=["POST"])
 def health():
@@ -72,12 +79,6 @@ def continuous_integration():
 
     msg = EmailMessage()
 
-
-    conf = yaml.load(open('app.yml'),Loader=yaml.Loader)
-    email_from = str(conf['user']['email'])
-    pwd = str(conf['user']['password'])
-
-
     if return_code == 100 and "master" in branch:
         os.system('echo "stawiamy nowa wersja z mastera"')
         os.system("docker build . -t mysql_db:1.1  -f git/Billing/db/Dockerfile")
@@ -88,7 +89,7 @@ def continuous_integration():
         os.system("docker-compose -f git/Billing/prod.yml --env-file ./git/Billing/config/.env.prod up --detach")
         os.system('echo "docker compose up"')
         os.system("docker-compose -f git/Weight/prod.yml --env-file ./git/Weight/config/.env.prod up --detach")
-    
+
     elif return_code == 100 and "master" not in branch:
         os.system('echo "success"')
         msg['Subject'] = subject_pass
