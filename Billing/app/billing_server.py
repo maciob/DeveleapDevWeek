@@ -11,7 +11,7 @@ from datetime import datetime
 import requests
 
 # import os
-
+#asd
 # Function to get ip of Flask app and DB  - required for dynamic ip
 def get_ip():
     hostname = socket.gethostname()

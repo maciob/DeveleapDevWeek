@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from functions import handle_out,handle_in,handle_none,handle_files
 import mysql.connector
 
-
+#asd
 load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
