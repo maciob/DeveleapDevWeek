@@ -274,7 +274,7 @@ def updadate_(id):
         return weight_response.content
 
 
-# Function to
+# Function to manage truck data on website
 @app.route("/trucks/<id>", methods=["GET", "POST"])
 def update_truck_html(id):
     # GET to eneter update truck website
