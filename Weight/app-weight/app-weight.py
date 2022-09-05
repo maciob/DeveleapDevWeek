@@ -11,8 +11,7 @@ from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv 
 from functions import handle_out,handle_in,handle_none,handle_files
-
-# import mysql.connector
+import mysql.connector
 
 
 load_dotenv()
@@ -172,7 +171,7 @@ def home():
     data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
     # return f"<h1>Home page of weight team app</h1>"
-    return render_template('homepage.html') 
+    return render_template('homepage.html',content=data) 
     
 
 @app.route('/batch-weight', methods = ['GET', 'POST']) 
