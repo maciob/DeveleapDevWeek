@@ -114,7 +114,7 @@ def weight():
 
 
 
-def weight12(t1,t2,arg1): #2
+def weight12(t1,t2,arg1): #23
     conn = getMysqlConnection()
     cursor = conn.cursor()
     query = f"SELECT * FROM transactions WHERE direction='{arg1}' AND datetime BETWEEN '{t1}' AND '{t2}';"
