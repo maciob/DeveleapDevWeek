@@ -1,8 +1,6 @@
 import smtplib
 from email.message import EmailMessage
-from email.mime.text import MIMEText
 from flask import Flask, jsonify, request
-import json
 import os
 import threading
 import time
