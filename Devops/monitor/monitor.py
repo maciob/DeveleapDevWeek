@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
-from contextlib import closing
 from flask import Flask, render_template
-import socket
 import os
 import requests
-
-
 
 app = Flask(__name__)
 
