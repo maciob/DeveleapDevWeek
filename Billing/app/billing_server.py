@@ -366,7 +366,7 @@ def get_bill(id):
     t2 = request.form.get("t2", current_time)
     for truck_id in truck_ids_list:
         weight_item_response = requests.get(
-            f"http://{url_for_request}}/item/{truck_id}?from={t1}&to={t2}"
+            f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}"
         )
         weight_item = weight_item_response.content
         sessions = weight_item["sessions"]
