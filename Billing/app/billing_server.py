@@ -364,6 +364,8 @@ def get_bill(id):
     month, year, current_time = getCurrentTime()
     t1 = request.form.get("t1", f"{year}01{month}000000")
     t2 = request.form.get("t2", current_time)
+    host, new_port = getBaseHost(request.environ["HTTP_HOST"])
+    url_for_request = host + ":" + new_port
     for truck_id in truck_ids_list:
         weight_item_response = requests.get(
             f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}"
