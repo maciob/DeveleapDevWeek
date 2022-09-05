@@ -221,16 +221,31 @@ def weight1():
     return json.dumps(weight11)
     
     
-@app.route("/session/<id>",methods=["GET"])
+@app.route("/session/<int:id>", methods=["GET","POST"])
 def sessionid(id):
     s1 = mysql1.connect()
     cur = s1.cursor()
-    query = """select * from transactions where id = %s;"""
-    tuple1 = id
-    cur.execute(query, tuple1)
-    sessions = cur.fetchall()
-    return jsonify(sessions)
-    
+    query = f"SELECT * FROM transactions WHERE id='{id}';"
+    cur.execute(query)
+    session = cur.fetchall()
+    for record in session:
+        if record[2] == 'in':
+            #list=[]
+            for row in session:
+                row1 = {}
+                row1["id"] = row[0]
+                row1["truck"] = row[3]
+                row1["bruto"] = row[5]
+                #list.append(row1)
+                return json.dumps(row1)
+        elif record[2] == 'out':
+            #list1 = []
+            for rec in session:
+                rec1 = {}
+                rec1["truckTara"] = rec[6]
+                rec1["neto"] = rec[7]
+                #list1.append(rec1)
+                return json.dumps(rec1)
 @app.route("/health",methods=["GET"])
 def testdb():
     
