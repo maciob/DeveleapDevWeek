@@ -1,17 +1,8 @@
-<!-- {% extends 'index.html' %}
+{% extends 'index.html' %}
 
-{% block title %}Internal Server Error{% endblock %}
-{% block body %}
-<h1>Internal Server Error</h1>
-<p>We are sorry for the inconvenience but the server is currently down. Please contact the server administrator to resolve the issue.</p>
-{% endblock %} -->
-
-{% extends "index.html" %}
-{% block title %}Page Not Found{% endblock %}
-{% block body %}
-  <h1>Page Not Found</h1>
-  <p>What you were looking for is just not there.
-  <p><a href="{{ url_for('index') }}">go somewhere nice</a>
+{% block content %}
+    <h1>{% block title %} {{ title }} {% endblock %}</h1>
+    <p>{{ env }}</p>
 {% endblock %}
 
 

@@ -103,7 +103,7 @@ def weight():
                return render_template('error.html')
         elif direction == "none":
             try:
-                response = handle_none(direction,containers,weight,date_created)
+                response = handle_none(direction,containers,weight,date_created,type_product)
                 return response
             except:
                 return render_template('error.html')
@@ -131,23 +131,23 @@ def weight1(t1,t2,arg1):
         the_weight_dic["containers"] = item[4]
         the_weight_list.append(the_weight_dic)
     conn.close()
-    return json.dumps(the_weight_list)
+    return the_weight_list
 
 def getitem(id, arg1, arg2):
-    db = mysql1.connect()
+    db = getMysqlConnection()
     cur1 = db.cursor()
-    sidtruck = f"SELECT * FROM transactions WHERE id='{id}' and datetime BETWEEN '{arg1}' AND '{arg2}';"
+    sidtruck = f"SELECT * FROM transactions WHERE id='{id}' AND datetime BETWEEN '{arg1}' AND '{arg2}';"
     cur1.execute(sidtruck)
     back1=cur1.fetchall()
     cur1.close()
     new_records = []
     for record in back1:
         truck1 = {}
-        truck1["id"] = record[0]
-        truck1["tara"] = record[6]
+        truck1["id"] = record[0][0]
+        truck1["tara"] = record[0][6]
         new_records.append(truck1)
     if back1==[]:
-        db = mysql.connect()
+        db = getMysqlConnection()
         cur1 = db.cursor()
         sidtruck = f"SELECT * FROM containers_registered WHERE container_id='{id}';"
         cur1.execute(sidtruck)
@@ -156,9 +156,9 @@ def getitem(id, arg1, arg2):
         new_records = []
         for record in back1:
             container1 = {}
-            container1["container_id"] = record[0]
-            container1["weight"] = record[1]
-            container1["unit"] = record[2]
+            container1["container_id"] = record[0][0]
+            container1["weight"] = record[0][1]
+            container1["unit"] = record[0][2]
             new_records.append(container1)
     return new_records
 
@@ -210,7 +210,7 @@ def item(id):
     arg2 = request.args.get('to', default=datetime.now())
     
     item_truck = getitem(id, arg1, arg2)
-    return json.dumps(item_truck)
+    return jsonify(item_truck)
 
 @app.route("/weight1",methods=["GET", "POST"])
 def weight1():
@@ -221,16 +221,31 @@ def weight1():
     return json.dumps(weight11)
     
     
-@app.route("/session/<id>",methods=["GET"])
+@app.route("/session/<int:id>", methods=["GET","POST"])
 def sessionid(id):
     s1 = mysql1.connect()
     cur = s1.cursor()
-    query = """select * from transactions where id = %s;"""
-    tuple1 = id
-    cur.execute(query, tuple1)
-    sessions = cur.fetchall()
-    return jsonify(sessions)
-    
+    query = f"SELECT * FROM transactions WHERE id='{id}';"
+    cur.execute(query)
+    session = cur.fetchall()
+    for record in session:
+        if record[2] == 'in':
+            #list=[]
+            for row in session:
+                row1 = {}
+                row1["id"] = row[0]
+                row1["truck"] = row[3]
+                row1["bruto"] = row[5]
+                #list.append(row1)
+                return json.dumps(row1)
+        elif record[2] == 'out':
+            #list1 = []
+            for rec in session:
+                rec1 = {}
+                rec1["truckTara"] = rec[6]
+                rec1["neto"] = rec[7]
+                #list1.append(rec1)
+                return json.dumps(rec1)
 @app.route("/health",methods=["GET"])
 def testdb():
     
