@@ -115,7 +115,7 @@ def weight():
 
 
 def weight1(t1,t2,arg1):
-    conn = mysql1.connect()
+    conn = getMysqlConnection()
     cursor = conn.cursor()
     query = f"SELECT * FROM transactions WHERE direction='{arg1}' AND datetime BETWEEN '{t1}' AND '{t2}';"
     cursor.execute(query)
@@ -210,7 +210,7 @@ def item(id):
     arg2 = request.args.get('to', default=datetime.now())
     
     item_truck = getitem(id, arg1, arg2)
-    return jsonify(item_truck)
+    return render_template('item.html',content=item_truck)
 
 @app.route("/weight1",methods=["GET", "POST"])
 def weight1():
