@@ -2,7 +2,6 @@ import mysql.connector
 import json
 import socket
 
-
 def get_ip():
     hostname = socket.gethostname()
     IPAddr = socket.gethostbyname(hostname)

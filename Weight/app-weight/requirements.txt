@@ -2,6 +2,6 @@ flask
 datetime
 flask-mysql
 cryptography
-dotenv
+python-dotenv
 werkzeug.utils
 os

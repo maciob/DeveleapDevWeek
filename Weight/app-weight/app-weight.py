@@ -45,8 +45,8 @@ app.config["MYSQL_DATABASE_DB"] = "weight"
 app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
 mysql.init_app(app)
 
-# def getMysqlConnection():
-#     return mysql.connector.connect(user='root', host='mysqlcont', port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
+def getMysqlConnection():
+    return mysql.connector.connect(user='root', host=f"{get_ip()[1]}", port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
 
 
 
@@ -224,7 +224,7 @@ def weight1():
 def sessionid(id):
     s1 = mysql.connect()
     cur = s1.cursor()
-    query = """select * from containers_registered where container_id = %s;"""
+    query = """select * from transactions where id = %s;"""
     tuple1 = id
     cur.execute(query, tuple1)
     sessions = cur.fetchall()
