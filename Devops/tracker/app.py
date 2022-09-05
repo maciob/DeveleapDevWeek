@@ -7,7 +7,7 @@ import time
 import re
 import subprocess
 import yaml
-
+#asd
 app = Flask(__name__)
 
 lista = []
