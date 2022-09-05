@@ -136,7 +136,7 @@ def weight1(t1,t2,arg1):
 def getitem(id, arg1, arg2):
     db = mysql1.connect()
     cur1 = db.cursor()
-    sidtruck = f"SELECT * FROM transactions WHERE id='{id}' and datetime BETWEEN '{arg1}' AND '{arg2}';"
+    sidtruck = f"SELECT * FROM transactions WHERE id='{id}' AND datetime BETWEEN '{arg1}' AND '{arg2}';"
     cur1.execute(sidtruck)
     back1=cur1.fetchall()
     cur1.close()
