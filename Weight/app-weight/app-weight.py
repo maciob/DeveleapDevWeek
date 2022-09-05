@@ -7,12 +7,25 @@ from datetime import datetime
 import csv
 import json
 import socket
-# import mysql.connector
+from werkzeug.utils import secure_filename  
+import os
+from dotenv import load_dotenv 
+from functions import handle_out,handle_in,handle_none,handle_files
+import mysql.connector
+
+
+load_dotenv()
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+class Config(object):
+    UPLOAD_FOLDER = os.path.join(basedir, './in')
+    ALLOWED_EXTENSIONS = {'csv','json'}
+    SESSION_TYPE = 'session'
 
 
 app = Flask(__name__)
-
-number = 1
+app.config.from_object(Config)  #1
+app.secret_key = "@#dsfs$!!fsgsg342424"
 
 def get_ip():
     hostname = socket.gethostname()
@@ -24,87 +37,85 @@ def get_ip():
     return (IPAddr, new_IP)
 
 app = Flask(__name__)
-mysql = MySQL()
+mysql1 = MySQL()
 app.config["MYSQL_DATABASE_USER"] = "root"
 app.config["MYSQL_DATABASE_PASSWORD"] = "password"
 app.config["MYSQL_DATABASE_DB"] = "weight"
 app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
-mysql.init_app(app)
+mysql1.init_app(app)
 
-# def getMysqlConnection():
-#     return mysql.connector.connect(user='root', host='mysqlcont', port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
+def getMysqlConnection():
+    return mysql.connector.connect(user='root', host=f"{get_ip()[1]}", port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
 
 
 
 @app.route("/weight", methods=["GET","POST"])
 def weight():
-    
- if request.method == "POST":
-    details = request.form                      #Assigning data from form to variables
-    id = details["id"]
-    direction = details["direction"]
-    truck_license = details["truck_license"]
-    containers = details["containers"]
-    type_product = details["type_product"]
-    date_created = details["date_created"]
-    weight = details["weight"]
-    conn = mysql.connect()
-    cur = conn.cursor()
-    if direction == "in":
-        try:
-            global number
-            id = number
-            number += 1
-            cur.execute("INSERT INTO transactions(id,datetime,direction,truck,containers,bruto,produce) VALUES (%s, %s, %s,%s, %s, %s,%s)", (id,date_created,direction,truck_license,containers,weight,type_product))
-            data = {}
-            data['id'] = id
-            data['truck'] = truck_license
-            data['bruto'] = weight
-            json_data = json.dumps(data)
-            return json_data
-        except:
-            return 'Error'
-    elif direction == "out":
-        try:
-            truckTara = details["weight"]
-            cur.execute("SELECT * FROM containers_registered")
-            containers_database = cur.fetchall()
-            cur.execute(f"SELECT containers FROM transactions WHERE id='{id}'")
-            containers_declared = cur.fetchall()
-            containers_declared = list(containers_declared[0])
-            containers_declared= containers_declared[0].split(",")
-            sum = 0
-            for container in containers_declared:
-                for container_db in containers_database:
-                    if container == container_db[0]:
-                        sum += container_db[1]
-            cur.execute(f"SELECT bruto FROM transactions WHERE id='{id}'")
-            brutto = cur.fetchall()
-            brutto = brutto[0][0]
-            netto = int(brutto) - int(weight) - sum
-            cur.execute(f"INSERT INTO transactions(truckTara,neto) VALUES (%s, %s)", (truckTara,netto))
-            cur.execute(f"UPDATE transactions SET direction = '{direction}' WHERE id = '{id}'")
-            cur.execute(f"SELECT id,truck,bruto,truckTara FROM transactions WHERE id={id}")
+    if request.method == "POST":
+        details = request.form                      
+        id = details["id"]
+        direction = details["direction"]
+        truck_license = details["truck_license"]
+        containers = details["containers"]
+        type_product = details["type_product"]
+        if type_product == "":
+            type_product = "na"
+        if truck_license == "":
+            truck_license = "na"
+        date_created = details["date_created"]
+        weight = details["weight"]
+        force = details["force"]
+        conn = getMysqlConnection()
+        cur = conn.cursor()
+        
+        if force == "True":
+            cur.execute(f"SELECT direction FROM transactions WHERE id='{id}'")
             result = cur.fetchall()
-            result = result[0]
-            data = {}
-            data['id'] = result[0]
-            data['truck'] = result[1]
-            data['bruto'] = result[2]
-            data['truckTara'] = truckTara
-            data['neto'] = netto
-            json_data = json.dumps(data)
-            return json_data
-        except:
-            return 'Error'
+            result = result[0][0]
+            if result == direction and result == "in":   
+                cur.execute(f"UPDATE transactions SET bruto = '{weight}', datetime = '{date_created}' WHERE id = '{id}'")
+                return f'New gross weight - {weight}'
 
+            elif result == direction and result == "out":
+                json = handle_out(id,weight,direction,date_created)
+                return f"New data {json}"
+
+            else:
+                return render_template('error.html')
+        
+        elif direction == "in":
+            try:
+                json = handle_in(id,date_created,direction,truck_license,containers,weight,type_product)
+                return json
+            except:
+                return render_template('error.html')
+        
+        elif direction == "out":
+            try:
+                cur.execute(f"SELECT direction FROM transactions WHERE id='{id}'")
+                result = cur.fetchall()
+                result = result[0][0]
+                if result == "out":
+                    return 'You cannot overwrite existing form without force'
+                json = handle_out(id,weight,direction,date_created)
+                return json
+            except:
+               return render_template('error.html')
+        elif direction == "none":
+            try:
+                response = handle_none(direction,containers,weight,date_created)
+                return response
+            except:
+                return render_template('error.html')
+        else:
+            return render_template('error.html')
     else:
-        return render_template("index.html")
+        return render_template("form.html")
 
 
 
 def weight1(t1,t2,arg1):
-    conn = mysql.connect()
+    conn = mysql1.connect()
     cursor = conn.cursor()
     query = f"SELECT * FROM transactions WHERE direction='{arg1}' AND datetime BETWEEN '{t1}' AND '{t2}';"
     cursor.execute(query)
@@ -123,7 +134,7 @@ def weight1(t1,t2,arg1):
     return json.dumps(the_weight_list)
 
 def getitem(id, arg1, arg2):
-    db = mysql.connect()
+    db = mysql1.connect()
     cur1 = db.cursor()
     sidtruck = f"SELECT * FROM transactions WHERE id='{id}' and datetime BETWEEN '{arg1}' AND '{arg2}';"
     cur1.execute(sidtruck)
@@ -155,20 +166,25 @@ def getitem(id, arg1, arg2):
 
 @app.route("/",methods=["GET"])
 def home():
-    db = mysql.connect()
+    db = mysql1.connect()
     cur = db.cursor()
     data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
-    return f"<h1>Home page of weight team app</h1>"
+    # return f"<h1>Home page of weight team app</h1>"
+    return render_template('homepage.html',content=data) 
     
 
-@app.route("/batch-weight",methods=["GET","POST"])
-def batch_weight(): 
-    if request.method == "POST":
-        details = request.form
-        file = details['file']
-        handling_files(file)
-    return render_template("batch.html")
+@app.route('/batch-weight', methods = ['GET', 'POST']) 
+def upload_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      filename = secure_filename(f.filename)
+      f.save(os.path.join(Config.UPLOAD_FOLDER, filename))
+      handle_files(filename)
+      return f"You've uploaded file - {filename}"
+   
+   else:
+        return render_template('upload.html') 
 
 
 @app.route("/unknown",methods=["GET"])
@@ -176,7 +192,7 @@ def unknown():
     
     if request.method == "GET":
         users = []
-        conn =  mysql.connect()
+        conn =  mysql1.connect()
         cursor = conn.cursor()
         query = 'SELECT UserId from <table_name>;'
         cursor.execute(query)
@@ -186,7 +202,7 @@ def unknown():
 
         conn.close()
 
-        return jsonpickle.encode(users)
+        return json.dump(users)
 
 @app.route("/item/<id>",methods=["GET","POST"])
 def item(id):
@@ -207,9 +223,9 @@ def weight1():
     
 @app.route("/session/<id>",methods=["GET"])
 def sessionid(id):
-    s1 = mysql.connect()
+    s1 = mysql1.connect()
     cur = s1.cursor()
-    query = """select * from containers_registered where container_id = %s;"""
+    query = """select * from transactions where id = %s;"""
     tuple1 = id
     cur.execute(query, tuple1)
     sessions = cur.fetchall()
@@ -219,7 +235,7 @@ def sessionid(id):
 def testdb():
     
     try:
-        conn = mysql.connect()
+        conn = mysql1.connect()
         cur = conn.cursor()
         cur.execute("select 1;")
         results = cur.fetchone()
@@ -231,7 +247,7 @@ def testdb():
         return jsonify(thisdict)
     
 def handling_files(file):
-    conn = mysql.connect()
+    conn = mysql1.connect()
     cur = conn.cursor()
     input = file
     index = input.index(".")
@@ -281,5 +297,5 @@ def monitor():
 
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0')
+	app.run(debug=True, host='0.0.0.0')
  
