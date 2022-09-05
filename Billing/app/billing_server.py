@@ -371,8 +371,8 @@ def get_bill(id):
             f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}"
         )
         weight_item = weight_item_response.content
-        sessions = weight_item["sessions"]
-        session_count = session_count + len(sessions)
+        #sessions = weight_item["sessions"]
+        #session_count = session_count + len(sessions)
 
         # GET SESSIONS LIST FOR THAT TRUCK, return lenght, add lenght to session_count
         # GET with ID of ever session of this truck > /GET sessions, parse 'neto'
@@ -386,7 +386,7 @@ def get_bill(id):
         "to": t2,
         "truckCount": truck_count[0],
         "trucks_ids": truck_ids_list,
-        "sessionCount": session_count,
+        "sessionCount": weight_item,
         "products": products,
         "total": total,
     }
