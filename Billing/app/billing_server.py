@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from asyncio import proactor_events
+# Required libraries
+# from asyncio import proactor_events
 from crypt import methods
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
@@ -8,9 +9,10 @@ import socket
 from flask import send_file
 from datetime import datetime
 import requests
-import os
 
+# import os
 
+# Function to get ip of Flask app and DB  - required for dynamic ip
 def get_ip():
     hostname = socket.gethostname()
     IPAddr = socket.gethostbyname(hostname)
@@ -21,8 +23,10 @@ def get_ip():
     return (IPAddr, new_IP)
 
 
+# Initializing the Flask app
 app = Flask(__name__)
 
+# Mysql data required for connection
 mysql = MySQL()
 app.config["MYSQL_DATABASE_USER"] = "app"
 app.config["MYSQL_DATABASE_PASSWORD"] = "pass"
@@ -30,18 +34,21 @@ app.config["MYSQL_DATABASE_DB"] = "billdb"
 app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
 mysql.init_app(app)
 
+# Dictionary that contain datbase state
 dependiences = {"Database": "Unknown"}
 
-
+# Function that runs our Flask app
 def run():
     app.run(host="0.0.0.0")
 
 
+# Home route of our app - it returns our homepage
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
 
 
+# /env route returns env data for debugging
 @app.route("/env")
 def env():
     resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
@@ -49,6 +56,7 @@ def env():
     return render_template("env.html", env=str(odp), title="ENV data for debug")
 
 
+# /monitor is for Devops usage - it returns status of app
 @app.route("/monitor", methods=["GET", "POST"])
 def monitor():
     if request.method == "POST":
@@ -57,6 +65,7 @@ def monitor():
         return "<h1>U can POST this /monitor to get server status</h1></br>For example: </br> curl -X POST localhost:8086/monitor </br>"
 
 
+# /health is used to check database state
 @app.route("/health", methods=["GET"])
 def health():
     try:
@@ -78,9 +87,10 @@ def health():
         )
 
 
-# Temporarily changed to GET for testing -- later change to POST method!!!
+# /provider is used to display all providers and also add new provider
 @app.route("/provider", methods=["GET", "POST"])
 def add_provider():
+    # With GET we are showing all providers from db
     if request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -89,7 +99,7 @@ def add_provider():
         cur.close()
         conn.close()
         return render_template("provider.html", providers=data, title="Add provider")
-
+    # With POST we are adding new provider
     elif request.method == "POST":
         name = request.form["username"]
         conn = mysql.connect()
@@ -112,8 +122,10 @@ def add_provider():
             return jsonify(id=data)
 
 
+# /provider/<id> we are using to update provider name
 @app.route("/provider/<id>", methods=["PUT", "GET", "POST"])
 def update_provider(id):
+    # With PUT we are updating provider name for specific id
     if request.method == "PUT":
         name = request.form["username"]
         conn = mysql.connect()
@@ -132,7 +144,7 @@ def update_provider(id):
             cur.close()
             conn.close()
             return jsonify(data)
-
+    # With GET we are displaying data on the website
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -143,7 +155,8 @@ def update_provider(id):
         return render_template(
             "update_provider.html", providers=data, title="Update provider name", ids=id
         )
-
+    # With POST on the frontend layer we are performing the PUT action in the backend layer, because HTML does not support put action(only post and get)
+    # So its like a wrapper which performs PUT inside POST
     elif request.method == "POST":
         name = request.form["username"]
         response = requests.put(
@@ -154,6 +167,7 @@ def update_provider(id):
         return response.content
 
 
+# /ip is showing us ip informations about our containers
 @app.route("/ip", methods=["GET"])
 def ip():
     resp = f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
@@ -161,14 +175,17 @@ def ip():
     return render_template("ip.html", ip=resp, title="IP")
 
 
+# /ipdb is for DevOps usage to get our db ip
 @app.route("/ipdb", methods=["GET"])
 def ipdb():
     data = get_ip()[1]
     return jsonify(data)
 
 
+# /truck is used to get truck data
 @app.route("/truck", methods=["POST", "GET"])  # GET added for testing
 def add_truck():
+    # POST is used to add new truck
     if request.method == "POST":
         truck_id = request.form["id"]
         provider_id = request.form["provider"]
@@ -189,7 +206,7 @@ def add_truck():
         cur.close()
         conn.close()
         return jsonify(trucks)
-
+    # GET is showing truck data on the website
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -201,25 +218,32 @@ def add_truck():
         # data = jsonify(trucks)
         return render_template("trucks.html", status=trucks, title="Add truck")
 
+
+# Function necessary to get a Weight app ip
 def getBaseHost(url):
     list = url.split(":")
     host = list[0]
     port = list[1]
-    if port == '8086':
-        new_port = '8084'
+    if port == "8086":
+        new_port = "8084"
     else:
-        new_port = '8080'
-    return host,new_port
+        new_port = "8080"
+    return host, new_port
 
+
+# Function to get current time
 def getCurrentTime():
     now = datetime.now()
     month = now.strftime("%m")
     year = now.strftime("%Y")
     current_time = now.strftime("%Y%m%d%H%M%S")
-    return month,year,current_time
+    return month, year, current_time
 
+
+# Function to update provider for specific truck
 @app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
+    # PUT to perform update action
     if request.method == "PUT":
         provider_id = request.form["provider"]
         conn = mysql.connect()
@@ -235,20 +259,25 @@ def updadate_(id):
         cur.close()
         conn.close()
         return "OK"
+    # GET is used to get truck data from Weight app
     if request.method == "GET":
-        month,year,current_time = getCurrentTime()
+        month, year, current_time = getCurrentTime()
         truck_id = str(id)
         t1 = request.form.get("t1", f"{year}01{month}000000")
         t2 = request.form.get("t2", current_time)
-        host, new_port = getBaseHost(request.environ['HTTP_HOST'])
-        url_for_request = host + ':' + new_port
-        weight_response = requests.get(f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}")
-        #weight_response = {"id": truck_id, "t1": t1, "t2": t2}
+        host, new_port = getBaseHost(request.environ["HTTP_HOST"])
+        url_for_request = host + ":" + new_port
+        weight_response = requests.get(
+            f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}"
+        )
+        # weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return weight_response.content
-    
 
+
+# Function to
 @app.route("/trucks/<id>", methods=["GET", "POST"])
 def update_truck_html(id):
+    # GET to eneter update truck website
     if request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -260,6 +289,7 @@ def update_truck_html(id):
         return render_template(
             "update_truck.html", status=trucks, ids=id, title="Update Trucks data"
         )
+    # Another wrapper to PUT function because html does not support PUT. For more see - /provider/<id>
     if request.method == "POST":
         name = request.form["provider"]
         response = requests.put(
@@ -270,15 +300,17 @@ def update_truck_html(id):
         return response.content
 
 
+# Route to manage rates
 @app.route("/rates", methods=["POST", "GET"])
 def rates():
+    # GET is used to download rates file
     if request.method == "GET":
         # book = load_workbook("in/rates.xlsx")
         # sheet = book.active
         # return render_template("s3_excel_table.html", sheet=sheet)
         path = r"/app/in/rates.xlsx"
         return send_file(path, as_attachment=True)
-    #
+    # POST is inserting data from file to db
     elif request.method == "POST":
         excel_data = pd.read_excel(r"/app/in/rates.xlsx")
         # Read the values of the file in the dataframe
@@ -309,7 +341,9 @@ def rates():
         conn.close()
         return "Inserted into DB successfully"
 
-@app.route("/bill/<id>", methods=['GET'])
+
+# Function to get bill for specific provider
+@app.route("/bill/<id>", methods=["GET"])
 def get_bill(id):
     conn = mysql.connect()
     cur = conn.cursor()
@@ -327,30 +361,44 @@ def get_bill(id):
     total = 0
     products = []
     single_product = {}
-    month,year,current_time = getCurrentTime()
+    month, year, current_time = getCurrentTime()
     t1 = request.form.get("t1", f"{year}01{month}000000")
     t2 = request.form.get("t2", current_time)
     for truck_id in truck_ids_list:
-        weight_item = requests.get(f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}")
-        #GET SESSIONS LIST FOR THAT TRUCK, return lenght, add lenght to session_count
-        #GET with ID of ever session of this truck > /GET sessions, parse 'neto'
-        #get product name from GET /weight ???
-   
-    #trucks_ids for testing only
-    bill={"id": id, "name": provider_name[0], "from": t1, "to": t2, "truckCount": truck_count[0], "trucks_ids": truck_ids_list, "products": products, "total": total}
-    
+        weight_item = requests.get(
+            f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}"
+        )
+        # GET SESSIONS LIST FOR THAT TRUCK, return lenght, add lenght to session_count
+        # GET with ID of ever session of this truck > /GET sessions, parse 'neto'
+        # get product name from GET /weight ???
+
+    # trucks_ids for testing only
+    bill = {
+        "id": id,
+        "name": provider_name[0],
+        "from": t1,
+        "to": t2,
+        "truckCount": truck_count[0],
+        "trucks_ids": truck_ids_list,
+        "products": products,
+        "total": total,
+    }
 
     return jsonify(bill)
 
-#
+
+# Wrapper to POST /rates - it show the website with button to insert rates into the db
 @app.route("/prates", methods=["POST", "GET"])
 def prates():
+    # Rendering the rates website
     if request.method == "GET":
         return render_template("rates.html", title="Post rates")
+    # POST that is performed by button - it runs POST /rates
     if request.method == "POST":
         response = requests.post(f"http://{request.environ['HTTP_HOST']}/rates")
         return response.content
 
 
+# Running the Flask app
 if __name__ == "__main__":
     run()
