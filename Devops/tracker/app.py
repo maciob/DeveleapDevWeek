@@ -1,6 +1,5 @@
 import smtplib
 from email.message import EmailMessage
-
 from flask import Flask, jsonify, request
 import os
 import threading
@@ -93,28 +92,30 @@ def continuous_integration():
     elif return_code == 100 and "master" not in branch:
         os.system('echo "success"')
         msg['Subject'] = subject_pass
+        msg['From'] = email_from
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
         msg.set_content(message_pass)
-        print(email_from)
-        print(pwd)
-        print(branch)
+#        print(email_from)
+#        print(pwd)
+#        print(branch)
         #print(type(branch))
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login(email_from, pwd)
-                smtp.send_message(msg)
+                smtp.send_message(msg, email_from)
         except ValueError:
             print("Failure in sending mail")
             pass
     else:
         os.system('echo "fail"')
         msg['Subject'] = subject_fail
+        msg['From'] = email_from
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
         msg.set_content(message_fail)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login(email_from, pwd)
-                smtp.send_message(msg)
+                smtp.send_message(msg, email_from)
         except:
             print("Failure in sending mail")
             pass
