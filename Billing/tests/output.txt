@@ -17,7 +17,7 @@ Passed.
  
 ./post_provider.sh
  
-Name already in database. Try again.
+HTTP/1.1 200 OK
 Passed.
  
 ./put_provider_id.sh

@@ -1,0 +1,58 @@
+
+<style>
+    body {font-family:Arial,Helvetica,sans-serif;}
+    * {box-sizing: border-box}
+    input[type=text],select,textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1 px solid #ccc;
+      border-radius: 4px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      resize: vertical;
+    }
+    input[type=submit] {
+      background-color: #04AA6D;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input[type=submit]:hover{
+    background-color: #45a049;
+    }
+    .fields {
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+    </style>
+    {{content}}
+    <div class ="fields">
+    <form method="post">
+        <label for="direction">Direction:</label>
+        <select name="direction">
+          <option value="in">IN</option>
+          <option value="out">OUT</option>
+          <option value="none">NONE</option></select>
+        <label for="id">ID</label>
+        <input type="text" name="id"><br>
+        <label for="truck_license">Truck license</label>
+        <input type="text" name="truck_license"><br>
+        <label for="containers">Containers</label>
+        <input type="text" name="containers"><br>
+        <label for="weight">Weight</label>
+        <input type="text" name="weight"><br>
+        <label for="type_product">Product:</label>
+        <input type="text" name="type_product"><br>
+        <label for="date_created">Date:</label>
+        <input type="date" name="date_created"><br>
+        <label for="force">Force</label>
+        <select name="force">
+          <option value="True">True</option>
+          <option value="False">False</option></select>
+        <input type = "submit" value = "Submit" />
+          </form>
+        </div>
+    
