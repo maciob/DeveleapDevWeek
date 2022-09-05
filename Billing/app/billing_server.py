@@ -351,6 +351,16 @@ def prates():
         response = requests.post(f"http://{request.environ['HTTP_HOST']}/rates")
         return response.content
 
+@app.errorhandler(404)
+def page_not_found(e):
+    # 404 - Page Not Found
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def page_not_found(e):
+    # 500 - Internal Server Error
+    return render_template('500.html'), 500
+
 
 if __name__ == "__main__":
     run()
