@@ -271,7 +271,8 @@ def updadate_(id):
             f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}"
         )
         # weight_response = {"id": truck_id, "t1": t1, "t2": t2}
-        return weight_response.content
+        return render_template("index.html", content=weight_response.content)
+        
 
 
 # Function to manage truck data on website
