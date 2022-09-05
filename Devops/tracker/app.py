@@ -75,7 +75,7 @@ def continuous_integration():
     msg = EmailMessage()
 
 
-    conf = yaml.load(open('../app.yml'))
+    conf = yaml.load(open('app.yml'),Loader=yaml.Loader)
     email = conf['user']['email']
     pwd = conf['user']['password']
 
