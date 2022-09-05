@@ -143,8 +143,8 @@ def getitem(id, arg1, arg2):
     new_records = []
     for record in back1:
         truck1 = {}
-        truck1["id"] = record[0]
-        truck1["tara"] = record[6]
+        truck1["id"] = record[0][0]
+        truck1["tara"] = record[0][6]
         new_records.append(truck1)
     if back1==[]:
         db = mysql.connect()
@@ -156,9 +156,9 @@ def getitem(id, arg1, arg2):
         new_records = []
         for record in back1:
             container1 = {}
-            container1["container_id"] = record[0]
-            container1["weight"] = record[1]
-            container1["unit"] = record[2]
+            container1["container_id"] = record[0][0]
+            container1["weight"] = record[0][1]
+            container1["unit"] = record[0][2]
             new_records.append(container1)
     return new_records
 
