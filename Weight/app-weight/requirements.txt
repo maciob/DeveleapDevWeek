@@ -4,5 +4,4 @@ flask-mysql
 cryptography
 python-dotenv
 werkzeug
-os
 mysql-connector-python
