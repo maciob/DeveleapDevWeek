@@ -149,19 +149,30 @@ def getitem(id, arg1, arg2):
     if back1==[]:
         db = getMysqlConnection()
         cur1 = db.cursor()
-        sidtruck = f"SELECT * FROM containers_registered WHERE container_id='{id}';"
+        array_id = f"SELECT id FROM transactions WHERE truck='{id}' AND datetime BETWEEN '{arg1}' AND '{arg2}';"
+        cur1.execute(array_id)
+        sessions_id =cur1.fetchall()
+        sidtruck = f"SELECT truckTara FROM transactions WHERE truck='{id}' AND direction='out' AND datetime BETWEEN '{arg1}' AND '{arg2}' ORDER BY id desc LIMIT 1;"
         cur1.execute(sidtruck)
         back1=cur1.fetchall()
         cur1.close()
         new_records = []
-        for record in back1:
-            container1 = {}
-            container1["container_id"] = record[0]
-            container1["weight"] = record[1]
-            container1["unit"] = record[2]
-            new_records.append(container1)
+        truck1 = {}
+        truck1["id"] = id
+        truck1["truckTara"] = back1[0][0]
+        new_sessions = []
+        for element in sessions_id:
+            new_sessions.append(element[0])
+        truck1["sessions"] = new_sessions
+        new_records.append(truck1)
+        new_records = new_records[0]
     return new_records
-
+        
+        
+        
+        
+        
+        
 
 
 @app.route("/",methods=["GET"])
