@@ -8,6 +8,7 @@ import threading
 import time
 import re
 import subprocess
+import yaml
 
 app = Flask(__name__)
 
@@ -17,10 +18,6 @@ mailing_list = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus
                 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
 
 testingflag = False
-
-email_address = "mbekasinzynierka@gmail.com"
-email_password = "ynfrjwnpkzqysazy"
-
 
 @app.route("/monitor", methods=["POST"])
 def health():
@@ -76,6 +73,13 @@ def continuous_integration():
     message_fail = f"Sorry! Your commit {after} passed only {return_code} tests."
 
     msg = EmailMessage()
+
+
+    conf = yaml.load(open('conf/application.yml'))
+    email = conf['user']['email']
+    pwd = conf['user']['password']
+
+
     if return_code == 100 and "master" in branch:
         os.system('echo "stawiamy nowa wersja z mastera"')
         os.system("docker build . -t mysql_db:1.1  -f git/Billing/db/Dockerfile")
@@ -91,12 +95,11 @@ def continuous_integration():
         os.system('echo "success"')
 
         msg['Subject'] = subject_pass
-        msg['From'] = email_address
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
         msg.set_content(message_pass)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login(email_address, email_password)
+                smtp.login(email, pwd)
                 smtp.send_message(msg)
         except:
             print("Failure in sending mail")
@@ -104,12 +107,11 @@ def continuous_integration():
     else:
         os.system('echo "fail"')
         msg['Subject'] = subject_fail
-        msg['From'] = email_address
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
         msg.set_content(message_fail)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login(email_address, email_password)
+                smtp.login(email, pwd)
                 smtp.send_message(msg)
         except:
             print("Failure in sending mail")
