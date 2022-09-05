@@ -70,7 +70,7 @@ def handle_out(id,weight,direction,date_created):
     json_data = json.dumps(data)
     return json_data
 
-def handle_none(direction,container,weight,date_created):
+def handle_none(direction,container,weight,date_created,type_product):
     conn = getMysqlConnection()
     cur = conn.cursor()
     cur.execute("SELECT id FROM transactions ORDER BY id desc LIMIT 1")
@@ -81,7 +81,7 @@ def handle_none(direction,container,weight,date_created):
         id = result[0][0] + 1
     conn = getMysqlConnection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO transactions(id,direction,containers,bruto,datetime) VALUES (%s, %s, %s,%s,%s)", (id,direction,container,weight,date_created))
+    cur.execute("INSERT INTO transactions(id,direction,containers,bruto,datetime,produce) VALUES (%s, %s, %s,%s,%s,%s)", (id,direction,container,weight,date_created,type_product))
     return "Container was succesfully registered to database"
 
 

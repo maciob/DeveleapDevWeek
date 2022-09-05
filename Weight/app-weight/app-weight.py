@@ -103,7 +103,7 @@ def weight():
                return render_template('error.html')
         elif direction == "none":
             try:
-                response = handle_none(direction,containers,weight,date_created)
+                response = handle_none(direction,containers,weight,date_created,type_product)
                 return response
             except:
                 return render_template('error.html')
