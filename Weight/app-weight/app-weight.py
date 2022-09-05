@@ -223,7 +223,7 @@ def item(id):
     item_truck = getitem(id, arg1, arg2)
     return render_template('item.html',content=item_truck)
 
-@app.route("/weight1",methods=["GET", "POST"])
+@app.route("/weight1/from=t1&to=t2&filter=f",methods=["GET", "POST"])
 def weight1():
     arg1 = request.args.get('filter', default = "in", type = str)
     t1 = request.args.get('t1', default = datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
