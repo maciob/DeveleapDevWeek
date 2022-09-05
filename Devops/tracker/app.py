@@ -74,8 +74,8 @@ def continuous_integration():
 
 
     conf = yaml.load(open('app.yml'),Loader=yaml.Loader)
-    email = conf['user']['email']
-    pwd = conf['user']['password']
+    email_from = str(conf['user']['email'])
+    pwd = str(conf['user']['password'])
 
 
     if return_code == 100 and "master" in branch:
@@ -94,11 +94,13 @@ def continuous_integration():
         msg['Subject'] = subject_pass
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
         msg.set_content(message_pass)
-        print(email)
+        print(email_from)
         print(pwd)
+        print(branch)
+        #print(type(branch))
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login(email, pwd)
+                smtp.login(email_from, pwd)
                 smtp.send_message(msg)
         except ValueError:
             print("Failure in sending mail")
@@ -110,7 +112,7 @@ def continuous_integration():
         msg.set_content(message_fail)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login(email, pwd)
+                smtp.login(email_from, pwd)
                 smtp.send_message(msg)
         except:
             print("Failure in sending mail")
