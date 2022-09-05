@@ -37,12 +37,12 @@ def get_ip():
     return (IPAddr, new_IP)
 
 app = Flask(__name__)
-mysql = MySQL()
+mysql1 = MySQL()
 app.config["MYSQL_DATABASE_USER"] = "root"
 app.config["MYSQL_DATABASE_PASSWORD"] = "password"
 app.config["MYSQL_DATABASE_DB"] = "weight"
 app.config["MYSQL_DATABASE_HOST"] = f"{get_ip()[1]}"
-mysql.init_app(app)
+mysql1.init_app(app)
 
 def getMysqlConnection():
     return mysql.connector.connect(user='root', host=f"{get_ip()[1]}", port='3306', password='password', database='weight',auth_plugin='mysql_native_password')
@@ -115,7 +115,7 @@ def weight():
 
 
 def weight1(t1,t2,arg1):
-    conn = mysql.connect()
+    conn = mysql1.connect()
     cursor = conn.cursor()
     query = f"SELECT * FROM transactions WHERE direction='{arg1}' AND datetime BETWEEN '{t1}' AND '{t2}';"
     cursor.execute(query)
@@ -134,7 +134,7 @@ def weight1(t1,t2,arg1):
     return json.dumps(the_weight_list)
 
 def getitem(id, arg1, arg2):
-    db = mysql.connect()
+    db = mysql1.connect()
     cur1 = db.cursor()
     sidtruck = f"SELECT * FROM transactions WHERE id='{id}' and datetime BETWEEN '{arg1}' AND '{arg2}';"
     cur1.execute(sidtruck)
@@ -166,7 +166,7 @@ def getitem(id, arg1, arg2):
 
 @app.route("/",methods=["GET"])
 def home():
-    db = mysql.connect()
+    db = mysql1.connect()
     cur = db.cursor()
     data = cur.execute("SELECT * FROM containers_registered;")
     data = cur.fetchall()
@@ -192,7 +192,7 @@ def unknown():
     
     if request.method == "GET":
         users = []
-        conn =  mysql.connect()
+        conn =  mysql1.connect()
         cursor = conn.cursor()
         query = 'SELECT UserId from <table_name>;'
         cursor.execute(query)
@@ -223,7 +223,7 @@ def weight1():
     
 @app.route("/session/<id>",methods=["GET"])
 def sessionid(id):
-    s1 = mysql.connect()
+    s1 = mysql1.connect()
     cur = s1.cursor()
     query = """select * from transactions where id = %s;"""
     tuple1 = id
@@ -235,7 +235,7 @@ def sessionid(id):
 def testdb():
     
     try:
-        conn = mysql.connect()
+        conn = mysql1.connect()
         cur = conn.cursor()
         cur.execute("select 1;")
         results = cur.fetchone()
@@ -247,7 +247,7 @@ def testdb():
         return jsonify(thisdict)
     
 def handling_files(file):
-    conn = mysql.connect()
+    conn = mysql1.connect()
     cur = conn.cursor()
     input = file
     index = input.index(".")
