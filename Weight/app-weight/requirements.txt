@@ -3,6 +3,6 @@ datetime
 flask-mysql
 cryptography
 python-dotenv
-werkzeug.utils
+werkzeug
 os
 mysql-connector-python
