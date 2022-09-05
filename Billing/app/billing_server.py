@@ -11,7 +11,7 @@ from datetime import datetime
 import requests
 
 # import os
-
+#asd
 # Function to get ip of Flask app and DB  - required for dynamic ip
 def get_ip():
     hostname = socket.gethostname()
@@ -272,6 +272,7 @@ def updadate_(id):
         )
         # weight_response = {"id": truck_id, "t1": t1, "t2": t2}
         return weight_response.content
+        
 
 
 # Function to manage truck data on website
@@ -364,16 +365,10 @@ def get_bill(id):
     month, year, current_time = getCurrentTime()
     t1 = request.form.get("t1", f"{year}01{month}000000")
     t2 = request.form.get("t2", current_time)
-    host, new_port = getBaseHost(request.environ["HTTP_HOST"])
-    url_for_request = host + ":" + new_port
     for truck_id in truck_ids_list:
-        weight_item_response = requests.get(
-            f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}"
+        weight_item = requests.get(
+            f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}"
         )
-        weight_item = weight_item_response.content
-        #sessions = weight_item["sessions"]
-        #session_count = session_count + len(sessions)
-
         # GET SESSIONS LIST FOR THAT TRUCK, return lenght, add lenght to session_count
         # GET with ID of ever session of this truck > /GET sessions, parse 'neto'
         # get product name from GET /weight ???
@@ -386,7 +381,6 @@ def get_bill(id):
         "to": t2,
         "truckCount": truck_count[0],
         "trucks_ids": truck_ids_list,
-        "sessionCount": weight_item,
         "products": products,
         "total": total,
     }

@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from functions import handle_out,handle_in,handle_none,handle_files
 import mysql.connector
 
-
+#asd
 load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -114,8 +114,8 @@ def weight():
 
 
 
-def weight1(t1,t2,arg1):
-    conn = mysql1.connect()
+def weight12(t1,t2,arg1): #23
+    conn = getMysqlConnection()
     cursor = conn.cursor()
     query = f"SELECT * FROM transactions WHERE direction='{arg1}' AND datetime BETWEEN '{t1}' AND '{t2}';"
     cursor.execute(query)
@@ -143,25 +143,36 @@ def getitem(id, arg1, arg2):
     new_records = []
     for record in back1:
         truck1 = {}
-        truck1["id"] = record[0][0]
-        truck1["tara"] = record[0][6]
+        truck1["id"] = record[0]
+        truck1["tara"] = record[6]
         new_records.append(truck1)
     if back1==[]:
         db = getMysqlConnection()
         cur1 = db.cursor()
-        sidtruck = f"SELECT * FROM containers_registered WHERE container_id='{id}';"
+        array_id = f"SELECT id FROM transactions WHERE truck='{id}' AND datetime BETWEEN '{arg1}' AND '{arg2}';"
+        cur1.execute(array_id)
+        sessions_id =cur1.fetchall()
+        sidtruck = f"SELECT truckTara FROM transactions WHERE truck='{id}' AND direction='out' AND datetime BETWEEN '{arg1}' AND '{arg2}' ORDER BY id desc LIMIT 1;"
         cur1.execute(sidtruck)
         back1=cur1.fetchall()
         cur1.close()
         new_records = []
-        for record in back1:
-            container1 = {}
-            container1["container_id"] = record[0][0]
-            container1["weight"] = record[0][1]
-            container1["unit"] = record[0][2]
-            new_records.append(container1)
+        truck1 = {}
+        truck1["id"] = id
+        truck1["truckTara"] = back1[0][0]
+        new_sessions = []
+        for element in sessions_id:
+            new_sessions.append(element[0])
+        truck1["sessions"] = new_sessions
+        new_records.append(truck1)
+        new_records = new_records[0]
     return new_records
-
+        
+        
+        
+        
+        
+        
 
 
 @app.route("/",methods=["GET"])
@@ -204,22 +215,23 @@ def unknown():
 
         return json.dump(users)
 
-@app.route("/item/<id>",methods=["GET","POST"])
+@app.route("/item/<id>",methods=["GET","POST"]) #1
 def item(id):
     arg1 = request.args.get('from', default=datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
     arg2 = request.args.get('to', default=datetime.now())
     
     item_truck = getitem(id, arg1, arg2)
-    return jsonify(item_truck)
+    return render_template('item.html',content=item_truck)
 
 @app.route("/weight1",methods=["GET", "POST"])
 def weight1():
     arg1 = request.args.get('filter', default = "in", type = str)
     t1 = request.args.get('t1', default = datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
     t2 = request.args.get('t2', default = datetime.now(), type = int)
-    weight11 = weight1(t1,t2,arg1)
+    weight11 = weight12(t1,t2,arg1)
     return json.dumps(weight11)
     
+    #1
     
 @app.route("/session/<int:id>", methods=["GET","POST"])
 def sessionid(id):
