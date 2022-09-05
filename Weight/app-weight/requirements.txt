@@ -5,3 +5,4 @@ cryptography
 python-dotenv
 werkzeug.utils
 os
+mysql-connector-python

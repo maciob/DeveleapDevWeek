@@ -114,7 +114,7 @@ def weight():
         return render_template("form.html")
 
 
-@app.route("/weight2?from=t1&to=t2&filter=f", methods=["GET","POST"])
+
 def weight1(t1,t2,arg1):
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -134,7 +134,6 @@ def weight1(t1,t2,arg1):
     conn.close()
     return json.dumps(the_weight_list)
 
-@app.route("/item/<id>", methods=["GET","POST"])
 def getitem(id, arg1, arg2):
     db = mysql.connect()
     cur1 = db.cursor()
@@ -204,7 +203,7 @@ def unknown():
 
         conn.close()
 
-        return jsonpickle.encode(users)
+        return json.dump(users)
 
 @app.route("/item/<id>",methods=["GET","POST"])
 def item(id):
