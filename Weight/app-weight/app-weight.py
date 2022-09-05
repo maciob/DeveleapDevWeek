@@ -134,7 +134,7 @@ def weight1(t1,t2,arg1):
     return the_weight_list
 
 def getitem(id, arg1, arg2):
-    db = mysql1.connect()
+    db = getMysqlConnection()
     cur1 = db.cursor()
     sidtruck = f"SELECT * FROM transactions WHERE id='{id}' AND datetime BETWEEN '{arg1}' AND '{arg2}';"
     cur1.execute(sidtruck)
@@ -147,7 +147,7 @@ def getitem(id, arg1, arg2):
         truck1["tara"] = record[0][6]
         new_records.append(truck1)
     if back1==[]:
-        db = mysql.connect()
+        db = getMysqlConnection()
         cur1 = db.cursor()
         sidtruck = f"SELECT * FROM containers_registered WHERE container_id='{id}';"
         cur1.execute(sidtruck)
