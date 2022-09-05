@@ -131,7 +131,7 @@ def weight1(t1,t2,arg1):
         the_weight_dic["containers"] = item[4]
         the_weight_list.append(the_weight_dic)
     conn.close()
-    return json.dumps(the_weight_list)
+    return the_weight_list
 
 def getitem(id, arg1, arg2):
     db = mysql1.connect()
