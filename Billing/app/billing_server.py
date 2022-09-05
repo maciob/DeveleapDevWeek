@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from asyncio import proactor_events
+from crypt import methods
 from flask import Flask, render_template, request, jsonify
 from flaskext.mysql import MySQL
 import pandas as pd
@@ -40,7 +41,8 @@ def run():
 def home():
     return render_template("index.html")
 
-@app.route('/env')
+
+@app.route("/env")
 def env():
     resp = [str(f"{f}: {request.environ[f]}") for f in request.environ]
     odp = " \t ".join(resp)
@@ -66,10 +68,14 @@ def health():
             dependiences["Database"] = "OK"
             cur.close()
             conn.close()
-            return render_template("health.html", status=dependiences, title="Health status")
+            return render_template(
+                "health.html", status=dependiences, title="Health status"
+            )
     except:
         dependiences["Database"] = "DOWN"
-        return render_template("health.html", status=dependiences, title="Health status")
+        return render_template(
+            "health.html", status=dependiences, title="Health status"
+        )
 
 
 # Temporarily changed to GET for testing -- later change to POST method!!!
@@ -106,7 +112,7 @@ def add_provider():
             return jsonify(id=data)
 
 
-@app.route("/provider/<id>", methods=["PUT","GET","POST"])
+@app.route("/provider/<id>", methods=["PUT", "GET", "POST"])
 def update_provider(id):
     if request.method == "PUT":
         name = request.form["username"]
@@ -126,7 +132,7 @@ def update_provider(id):
             cur.close()
             conn.close()
             return jsonify(data)
-        
+
     elif request.method == "GET":
         conn = mysql.connect()
         cur = conn.cursor()
@@ -134,18 +140,23 @@ def update_provider(id):
         data = cur.fetchall()
         cur.close()
         conn.close()
-        return render_template("update_provider.html", providers=data, title="Update provider name" ,ids=id)
-    
+        return render_template(
+            "update_provider.html", providers=data, title="Update provider name", ids=id
+        )
+
     elif request.method == "POST":
         name = request.form["username"]
-        response = requests.put(f"http://{request.environ['HTTP_HOST']}/provider/{id}", data = {'username':f'{name}'})
+        response = requests.put(
+            f"http://{request.environ['HTTP_HOST']}/provider/{id}",
+            data={"username": f"{name}"},
+        )
         # return inf
         return response.content
 
 
 @app.route("/ip", methods=["GET"])
 def ip():
-    resp=f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
+    resp = f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
     # return f"Your flask app IP address is {get_ip()[0]}, and DB server IP address is {get_ip()[1]}"
     return render_template("ip.html", ip=resp, title="IP")
 
@@ -190,6 +201,22 @@ def add_truck():
         # data = jsonify(trucks)
         return render_template("trucks.html", status=trucks, title="Add truck")
 
+def getBaseHost(url):
+    list = url.split(":")
+    host = list[0]
+    port = list[1]
+    if port == '8086':
+        new_port = '8084'
+    else:
+        new_port = '8080'
+    return host,new_port
+
+def getCurrentTime():
+    now = datetime.now()
+    month = now.strftime("%m")
+    year = now.strftime("%Y")
+    current_time = now.strftime("%Y%m%d%H%M%S")
+    return month,year,current_time
 
 @app.route("/truck/<id>", methods=["PUT", "GET"])
 def updadate_(id):
@@ -209,18 +236,18 @@ def updadate_(id):
         conn.close()
         return "OK"
     if request.method == "GET":
-        now = datetime.now()
-        month = now.strftime("%m")
-        year = now.strftime("%Y")
-        current_time = now.strftime("%Y%m%d%H%M%S")
-        truck_id = id
+        month,year,current_time = getCurrentTime()
+        truck_id = str(id)
         t1 = request.form.get("t1", f"{year}01{month}000000")
         t2 = request.form.get("t2", current_time)
-        # weight_response = requests.get(f"http://localhost:8084/item/<{truck_id}>?from={t1}&to={t2}")
-        weight_response = {"id": truck_id, "t1": t1, "t2": t2}
-        return jsonify(weight_response)
+        host, new_port = getBaseHost(request.environ['HTTP_HOST'])
+        url_for_request = host + ':' + new_port
+        weight_response = requests.get(f"http://{url_for_request}/item/{truck_id}?from={t1}&to={t2}")
+        #weight_response = {"id": truck_id, "t1": t1, "t2": t2}
+        return weight_response.content
     
-@app.route("/trucks/<id>", methods=["GET","POST"])
+
+@app.route("/trucks/<id>", methods=["GET", "POST"])
 def update_truck_html(id):
     if request.method == "GET":
         conn = mysql.connect()
@@ -230,13 +257,17 @@ def update_truck_html(id):
         trucks = cur.fetchall()
         cur.close()
         conn.close()
-        return render_template("update_truck.html", status=trucks, ids=id, title="Update Trucks data")
+        return render_template(
+            "update_truck.html", status=trucks, ids=id, title="Update Trucks data"
+        )
     if request.method == "POST":
         name = request.form["provider"]
-        response = requests.put(f"http://{request.environ['HTTP_HOST']}/truck/{id}", data = {'provider':f'{name}'})
+        response = requests.put(
+            f"http://{request.environ['HTTP_HOST']}/truck/{id}",
+            data={"provider": f"{name}"},
+        )
         # return inf
         return response.content
-        
 
 
 @app.route("/rates", methods=["POST", "GET"])
@@ -245,11 +276,11 @@ def rates():
         # book = load_workbook("in/rates.xlsx")
         # sheet = book.active
         # return render_template("s3_excel_table.html", sheet=sheet)
-        path = r'/app/in/rates.xlsx'
+        path = r"/app/in/rates.xlsx"
         return send_file(path, as_attachment=True)
-
+    #
     elif request.method == "POST":
-        excel_data = pd.read_excel(r'/app/in/rates.xlsx')
+        excel_data = pd.read_excel(r"/app/in/rates.xlsx")
         # Read the values of the file in the dataframe
         data = pd.DataFrame(excel_data, columns=["Product", "Rate", "Scope"])
         conn = mysql.connect()
@@ -258,7 +289,7 @@ def rates():
         conn.commit()
         cur.close()
         conn.close()
-        # 
+        #
         conn = mysql.connect()
         cur = conn.cursor()
         for i in range(len(data.index)):
@@ -277,6 +308,40 @@ def rates():
         cur.close()
         conn.close()
         return "Inserted into DB successfully"
+
+@app.route("/bill/<id>", methods=['GET'])
+def get_bill(id):
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute(f"SELECT name from Provider WHERE id = {id};")
+    conn.commit()
+    provider_name = cur.fetchall()
+    cur.execute(f"SELECT COUNT(id) FROM Trucks WHERE provider_id={id};")
+    truck_count = cur.fetchall()
+    cur.execute(f"SELECT id FROM Trucks WHERE provider_id={id};")
+    truck_ids = cur.fetchall()
+    truck_ids_list = list(map(lambda x: x[0], truck_ids))
+    cur.close()
+    conn.close()
+    session_count = 0
+    total = 0
+    products = []
+    single_product = {}
+    month,year,current_time = getCurrentTime()
+    t1 = request.form.get("t1", f"{year}01{month}000000")
+    t2 = request.form.get("t2", current_time)
+    for truck_id in truck_ids_list:
+        weight_item = requests.get(f"http://18.170.241.119:8084/item/{truck_id}?from={t1}&to={t2}")
+        #GET SESSIONS LIST FOR THAT TRUCK, return lenght, add lenght to session_count
+        #GET with ID of ever session of this truck > /GET sessions, parse 'neto'
+        #get product name from GET /weight ???
+   
+    #trucks_ids for testing only
+    bill={"id": id, "name": provider_name[0], "from": t1, "to": t2, "truckCount": truck_count[0], "trucks_ids": truck_ids_list, "products": products, "total": total}
+    
+
+    return jsonify(bill)
+
 #
 @app.route("/prates", methods=["POST", "GET"])
 def prates():
@@ -285,6 +350,7 @@ def prates():
     if request.method == "POST":
         response = requests.post(f"http://{request.environ['HTTP_HOST']}/rates")
         return response.content
-    
+
+
 if __name__ == "__main__":
     run()
