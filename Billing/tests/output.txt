@@ -38,3 +38,9 @@ Passed when we want to get trucks data
  
 Inserted into DB successfully
 Passed.
+ 
+./get_truck_id.sh
+ 
+HTTP/1.1 200 OK
+      <h1>{&#39;id&#39;: &#39;1234&#39;, &#39;truckTara&#39;: 200, &#39;sessions&#39;: [11, 17, 18, 19, 20]}</h1>
+Passed.
