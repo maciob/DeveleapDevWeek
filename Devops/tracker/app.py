@@ -91,15 +91,16 @@ def continuous_integration():
     
     elif return_code == 100 and "master" not in branch:
         os.system('echo "success"')
-
         msg['Subject'] = subject_pass
         msg['To'] = ['dawidtomczynski@gmail.com', 'bekasmaciej@gmail.com', 'adamkobus11@gmail.com', 'dominikborkowski89@gmail.com', 'adam.stegienko1@gmail.com']
         msg.set_content(message_pass)
+        print(email)
+        print(pwd)
         try:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login(email, pwd)
                 smtp.send_message(msg)
-        except:
+        except ValueError:
             print("Failure in sending mail")
             pass
     else:
