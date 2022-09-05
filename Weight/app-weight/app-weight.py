@@ -215,7 +215,7 @@ def unknown():
 
         return json.dump(users)
 
-@app.route("/item/<id>",methods=["GET","POST"])
+@app.route("/item/<id>",methods=["GET","POST"]) #1
 def item(id):
     arg1 = request.args.get('from', default=datetime.combine(datetime.today().replace(day=1), datetime.min.time()))
     arg2 = request.args.get('to', default=datetime.now())
