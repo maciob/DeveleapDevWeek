@@ -1,1 +1,1 @@
-Blue Team Dev WEEK
+Blue Team DevOps Devweek
